@@ -1,4 +1,4 @@
-from pacing_types import Parameters
+from pacing_modes import Parameters
 
 class User:
     def __init__(self, username: str, password: str) -> None:

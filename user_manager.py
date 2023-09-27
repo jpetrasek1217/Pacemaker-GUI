@@ -48,6 +48,3 @@ def _findUser(username: str) -> Optional[User]:         # Finds user with matchi
     return None
 
 # TODO: Remove Testing Code
-
-loginUser("admin", "3K04")
-print(getActiveUser())
