@@ -1,7 +1,8 @@
 from tkinter import *
-#from pacing_modes import Parameters
+import user_manager
 #from pacing_modes import PacingModes
-import user_manager 
+#from pacing_modes import PacingModes
+
 
 
 root = Tk()
