@@ -2,7 +2,7 @@ import re
 import local_storage
 from user import User
 from typing import Optional
-from GUI_components import throwErrorPopup
+from GUI_helpers import throwErrorPopup
 
 
 _MAX_USERS_SAVED = int(10)
