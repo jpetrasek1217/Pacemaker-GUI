@@ -16,50 +16,53 @@ def getActiveUser() -> Optional[User]:
     return _activeUser
 
 
-def loginUser(username: str, password: str) -> None:
+def loginUser(username: str, password: str) -> tuple(bool, str):
     usernameFormatted = username.strip()
     passwordFormatted = password.strip()
 
-    validInputs = _validateUsernamePasswordInputs(usernameFormatted, passwordFormatted)
-    if(not validInputs):
-        return
+    returnSuccess, errorMsg = _validateUsernamePasswordInputs(usernameFormatted, passwordFormatted)
+    if(not returnSuccess):
+        return False, errorMsg
     
-    user = _findUser(usernameFormatted)                          # Checks that user exists
+    user = _findUser(usernameFormatted)     # Checks that user exists
     userExists = isinstance(user, User)
-    if userExists and user.getPassword() == passwordFormatted:   # If user exists and passwords match, set as active user
-        global _activeUser
-        _activeUser = user
-    else:
-        throwErrorPopup("Incorrect credentials.")
+    if not userExists or user.getPassword() != passwordFormatted:   
+        return False, "Incorrect credentials."
+    
+    global _activeUser          # If user exists and passwords match, set as active user
+    _activeUser = user
+    return True, ""
 
 
-def registerUser(username: str, password: str) -> None:
+def registerUser(username: str, password: str) -> tuple(bool, str):
     if len(_users) >= _MAX_USERS_SAVED:                 # Check that the amount of saved users is not maxed
-        throwErrorPopup("Maximum amount of users created.")
-        return
+        return False, "Maximum amount of users created."
     
     usernameFormatted = username.strip()
     passwordFormatted = password.strip()
 
-    validInputs = _validateUsernamePasswordInputs(usernameFormatted, passwordFormatted)
-    if(not validInputs):
-        return
+    returnSuccess, errorMsg = _validateUsernamePasswordInputs(usernameFormatted, passwordFormatted)
+    if(not returnSuccess):
+        return False, errorMsg
     
     usernameAvaliable = not isinstance(_findUser(usernameFormatted), User)   # Check if username is avaliable
-    if usernameAvaliable:                               # If username is avaliable, create new user and save user locally
-        newUser = User(usernameFormatted, passwordFormatted)
-        _users.append(newUser)
-        local_storage.writeUsersToFile(_users)
-    else:
-        throwErrorPopup(f"Username \'{usernameFormatted}\' already exists.")
+    if not usernameAvaliable:                               
+        return False, f"Username \'{usernameFormatted}\' already exists."
+    
+    newUser = User(usernameFormatted, passwordFormatted)    # If username is avaliable, create new user and save user locally
+    _users.append(newUser)
+    local_storage.writeUsersToFile(_users)
+    return True, ""
 
 
-def deleteUser(username: str) -> None:
+def deleteUser(username: str) -> tuple(bool, str):
     user = _findUser(username)                          # Checks that user exists
     userExists = isinstance(user, User)
-    if userExists:                                      # If user exists, remove from list and save updates locally
-        _users.remove(user)
-        local_storage.writeUsersToFile(_users)
+    if not userExists:                                  
+        return False, f"Cannot delete user \'{username}\', user does not exist."
+    
+    _users.remove(user)                                 # If user exists, remove from list and save updates locally
+    local_storage.writeUsersToFile(_users)
 
 
 def _findUser(username: str) -> Optional[User]:         # Finds user with matching username, returns user
@@ -71,18 +74,14 @@ def _findUser(username: str) -> Optional[User]:         # Finds user with matchi
     return None
 
 
-def _validateUsernamePasswordInputs(username: str, password: str) -> bool:
+def _validateUsernamePasswordInputs(username: str, password: str) -> tuple(bool, str):
     if(len(username) <= 0):
-        throwErrorPopup("Invalid username. Please fill in all required fields.")
-        return False
+        return False, "Invalid username. Please fill in all required fields."
     elif(not re.search(_REGEX_VALID_CHARS, username)):
-        throwErrorPopup("Invalid username. Please only use charaters from A-Z, a-z and 0-9.")
-        return False
+        return False, "Invalid username. Please only use charaters from A-Z, a-z and 0-9."
     elif(len(password) <= 0):
-        throwErrorPopup("Invalid password. Please fill in all required fields.")
-        return False
+        return False, "Invalid password. Please fill in all required fields."
     elif(not re.search(_REGEX_VALID_CHARS, password)):
-        throwErrorPopup("Invalid password. Please only use charaters from A-Z, a-z and 0-9.")
-        return False
+        return False, "Invalid password. Please only use charaters from A-Z, a-z and 0-9."
     else:
-        return True
+        return True, ""
