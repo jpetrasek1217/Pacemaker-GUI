@@ -2,7 +2,6 @@ import re
 import local_storage
 from user import User
 from typing import Optional
-from GUI_helpers import throwErrorPopup
 
 
 _MAX_USERS_SAVED = int(10)
@@ -16,7 +15,7 @@ def getActiveUser() -> Optional[User]:
     return _activeUser
 
 
-def loginUser(username: str, password: str) -> tuple(bool, str):
+def loginUser(username: str, password: str) -> tuple[bool, str]:
     usernameFormatted = username.strip()
     passwordFormatted = password.strip()
 
@@ -34,7 +33,7 @@ def loginUser(username: str, password: str) -> tuple(bool, str):
     return True, ""
 
 
-def registerUser(username: str, password: str) -> tuple(bool, str):
+def registerUser(username: str, password: str) -> tuple[bool, str]:
     if len(_users) >= _MAX_USERS_SAVED:                 # Check that the amount of saved users is not maxed
         return False, "Maximum amount of users created."
     
@@ -55,7 +54,7 @@ def registerUser(username: str, password: str) -> tuple(bool, str):
     return True, ""
 
 
-def deleteUser(username: str) -> tuple(bool, str):
+def deleteUser(username: str) -> tuple[bool, str]:
     user = _findUser(username)                          # Checks that user exists
     userExists = isinstance(user, User)
     if not userExists:                                  
@@ -74,7 +73,7 @@ def _findUser(username: str) -> Optional[User]:         # Finds user with matchi
     return None
 
 
-def _validateUsernamePasswordInputs(username: str, password: str) -> tuple(bool, str):
+def _validateUsernamePasswordInputs(username: str, password: str) -> tuple[bool, str]:
     if(len(username) <= 0):
         return False, "Invalid username. Please fill in all required fields."
     elif(not re.search(_REGEX_VALID_CHARS, username)):
