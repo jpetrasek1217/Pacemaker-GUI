@@ -1,5 +1,5 @@
 import json
-from user import User, Parameters   # TODO: Remove parameters import
+from user import User
 
 _USERS_FILEPATH = "users.json"
 _USERNAME_KEY = "username"
@@ -39,12 +39,3 @@ def writeUsersToFile(users: list[User]) -> None:
 def _writeToJSONFile(filepath: str, fileContents: dict) -> None:
     with open(filepath, "w") as file:
         json.dump(fileContents, file)
-
-# TODO: Remove Testing Code
-
-users = readUsersFromFile()
-users[1].setParameter(Parameters.ATRIAL_AMPLITUDE, 92.3)
-users[1].setParameter(Parameters.VENTRICULAR_REFACTORY_PERIOD, 29.34)
-writeUsersToFile(users)
-print(users)
-

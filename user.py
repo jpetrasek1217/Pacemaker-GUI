@@ -1,4 +1,4 @@
-from pacing_modes import Parameters
+from pacing_modes import Parameters, ParameterKeyError
 
 class User:
     def __init__(self, username: str, password: str) -> None:
@@ -8,9 +8,9 @@ class User:
        
 
     def __repr__(self) -> str:
-        s = "\nuser.User object:\n\tusername: " + self._username + "\n\tpassword: " + self._password + "\n"
+        s = f"\nuser.User object:\n\tusername: {self._username}\n\tpassword: {self._password}\n"
         for key in self._params:
-            s += "\t" + key + ": " + str(self._params[key]) + "\n"
+            s += f"\t{key}: {str(self._params[key])}\n"
         return s
     
 
@@ -27,7 +27,11 @@ class User:
 
 
     def getParameter(self, key: Parameters) -> float:
-        return self._params[key]
+        keyExists = isinstance(self._params.get(key), float)    # Check if key exists in user's parameters
+        if keyExists:
+            return self._params[key]
+        else:
+            raise ParameterKeyError(key)
     
 
     def getAllParameters(self) -> dict[Parameters, float]:
@@ -38,10 +42,15 @@ class User:
         keyExists = isinstance(self._params.get(key), float)    # Check if key exists in user's parameters
         if keyExists:
             self._params[key] = value
+        else:
+            raise ParameterKeyError(key)
 
 
     def setAllParameters(self, params: dict[Parameters, float]) -> None:
         for key in self._params:            # Loop through user's parameter dictonary
             value = params.get(key)         # Get value from sent dict, if it does not exist get() returns None
-            if isinstance(value, float):    # If the key did exist, set user's param to sent param
+            keyExists = isinstance(value, float)
+            if keyExists:                   # If the key did exist, set user's param to sent param
                 self._params[key] = value
+            else:
+                raise ParameterKeyError(key)
