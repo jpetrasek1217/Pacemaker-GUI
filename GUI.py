@@ -2,6 +2,7 @@ import tkinter as tk
 #from pacing_modes import Parameters
 #from pacing_modes import PacingModes
 import user_manager 
+from tkinter import messagebox
 
 
 root = tk.Tk()
@@ -13,7 +14,8 @@ Welcome_Frame = tk.Frame(root)
 Welcome_Frame.grid(row=0, column=0)
 
 DCM_Frame = tk.Frame(root)
-
+Upper_DCM_Frame = tk.Frame(DCM_Frame)
+Lower_DCM_Frame = tk.Frame(DCM_Frame)
 
 
 """
@@ -32,60 +34,123 @@ button_PARAMETERS = Button(frame_parameters, text="TEST", padx=10, pady=5)
 """
 
 def Change_Parameters(mode):
-    LRL_input.grid(row=0, column=0, columnspan=1, padx=10, pady=10)
-    LRL_Label.grid(row=1, column=0, columnspan=1, padx=10, pady=10)
-    URL_input.grid(row=0, column=1, columnspan=1, padx=10, pady=10)
-    URL_Label.grid(row=1, column=1, columnspan=1, padx=10, pady=10)
-    AA_input.grid(row=0, column=2, columnspan=1, padx=10, pady=10)
-    AA_Label.grid(row=1, column=2, columnspan=1, padx=10, pady=10)
-    APW_input.grid(row=0, column=3, columnspan=1, padx=10, pady=10)
-    APW_Label.grid(row=1, column=3, columnspan=1, padx=10, pady=10)
+    if mode == "AAIR" or mode == "AOOR" or mode == "VVIR" or mode == "VOOR":
+         return
+    for widget in Upper_DCM_Frame.winfo_children():
+            widget.grid_forget()
+    Title_Label = tk.Label(Upper_DCM_Frame, text="You are using Parameter " + mode)
+    Title_Label.grid(row=0,column=0, columnspan=5, padx=10, pady=10)
+    if mode=="AOO":
+        LRL_input.grid(row=1, column=0, columnspan=1, padx=10, pady=10)
+        LRL_Label.grid(row=2, column=0, columnspan=1, padx=10, pady=10)
+        URL_input.grid(row=1, column=1, columnspan=1, padx=10, pady=10)
+        URL_Label.grid(row=2, column=1, columnspan=1, padx=10, pady=10)
+        AA_input.grid(row=1, column=2, columnspan=1, padx=10, pady=10)
+        AA_Label.grid(row=2, column=2, columnspan=1, padx=10, pady=10)
+        APW_input.grid(row=1, column=3, columnspan=1, padx=10, pady=10)
+        APW_Label.grid(row=2, column=3, columnspan=1, padx=10, pady=10)
+    elif mode=="AAI":
+        LRL_input.grid(row=1, column=0, columnspan=1, padx=10, pady=10)
+        LRL_Label.grid(row=2, column=0, columnspan=1, padx=10, pady=10)
+        URL_input.grid(row=1, column=1, columnspan=1, padx=10, pady=10)
+        URL_Label.grid(row=2, column=1, columnspan=1, padx=10, pady=10)
+        AA_input.grid(row=1, column=2, columnspan=1, padx=10, pady=10)
+        AA_Label.grid(row=2, column=2, columnspan=1, padx=10, pady=10)
+        APW_input.grid(row=1, column=3, columnspan=1, padx=10, pady=10)
+        APW_Label.grid(row=2, column=3, columnspan=1, padx=10, pady=10)
+        AS_input.grid(row=3, column=0, columnspan=1, padx=10, pady=10)
+        AS_Label.grid(row=4, column=0, columnspan=1, padx=10, pady=10)
+        ARP_input.grid(row=3, column=1, columnspan=1, padx=10, pady=0)
+        ARP_Label.grid(row=4, column=1, columnspan=1, padx=10, pady=0)
+        PVARP_input.grid(row=3, column=2, columnspan=1, padx=10, pady=0)
+        PVARP_Label.grid(row=4, column=2, columnspan=1, padx=10, pady=0)
+        H_Label.grid(row=4, column=3, columnspan=1, padx=10, pady=0)
+        H_input.grid(row=3, column=3, columnspan=1, padx=10, pady=0)
+        RS_input.grid(row=3, column=4, columnspan=1, padx=10, pady=0)
+        RS_Label.grid(row=4, column=4, columnspan=1, padx=10, pady=0)
+    elif mode=="VOO":
+        LRL_input.grid(row=1, column=0, columnspan=1, padx=10, pady=10)
+        LRL_Label.grid(row=2, column=0, columnspan=1, padx=10, pady=10)
+        URL_input.grid(row=1, column=1, columnspan=1, padx=10, pady=10)
+        URL_Label.grid(row=2, column=1, columnspan=1, padx=10, pady=10)
+        VA_input.grid(row=1, column=2, columnspan=1, padx=10, pady=10)
+        VA_Label.grid(row=2, column=2, columnspan=1, padx=10, pady=10)
+        VPW_input.grid(row=1, column=3, columnspan=1, padx=10, pady=10)
+        VPW_Label.grid(row=2, column=3, columnspan=1, padx=10, pady=10)
+    elif mode=="VVI":
+        LRL_input.grid(row=1, column=0, columnspan=1, padx=10, pady=10)
+        LRL_Label.grid(row=2, column=0, columnspan=1, padx=10, pady=10)
+        URL_input.grid(row=1, column=1, columnspan=1, padx=10, pady=10)
+        URL_Label.grid(row=2, column=1, columnspan=1, padx=10, pady=10)
+        VA_input.grid(row=1, column=2, columnspan=1, padx=10, pady=10)
+        VA_Label.grid(row=2, column=2, columnspan=1, padx=10, pady=10)
+        VPW_input.grid(row=1, column=3, columnspan=1, padx=10, pady=10)
+        VPW_Label.grid(row=2, column=3, columnspan=1, padx=10, pady=10)
+        VS_input.grid(row=3, column=0, columnspan=1, padx=10, pady=10)
+        VS_Label.grid(row=4, column=0, columnspan=1, padx=10, pady=10)
+        VRP_input.grid(row=3, column=1, columnspan=1, padx=10, pady=0)
+        VRP_Label.grid(row=4, column=1, columnspan=1, padx=10, pady=0)
+        H_Label.grid(row=4, column=2, columnspan=1, padx=10, pady=0)
+        H_input.grid(row=3, column=2, columnspan=1, padx=10, pady=0)
+        RS_input.grid(row=3, column=3, columnspan=1, padx=10, pady=0)
+        RS_Label.grid(row=4, column=3, columnspan=1, padx=10, pady=0)
+    
 
 
-LRL_input = tk.Entry(DCM_Frame, width=10, bg="white", fg="blue")
-LRL_Label = tk.Label(DCM_Frame, text="Lower\nRate Limit")
 
-URL_input = tk.Entry(DCM_Frame, width=10, bg="white", fg="blue")
-URL_Label = tk.Label(DCM_Frame, text="Upper\nRate Limit")
+LRL_input = tk.Entry(Upper_DCM_Frame, width=10, bg="white", fg="blue")
+LRL_Label = tk.Label(Upper_DCM_Frame, text="Lower\nRate Limit")
 
-AA_input = tk.Entry(DCM_Frame, width=10, bg="white", fg="blue")
-AA_Label = tk.Label(DCM_Frame, text="Atrial\nAmplitude")
+URL_input = tk.Entry(Upper_DCM_Frame, width=10, bg="white", fg="blue")
+URL_Label = tk.Label(Upper_DCM_Frame, text="Upper\nRate Limit")
 
-APW_input = tk.Entry(DCM_Frame, width=10, bg="white", fg="blue")
-APW_Label = tk.Label(DCM_Frame, text="Atrial\nPulse Width")
+AA_input = tk.Entry(Upper_DCM_Frame, width=10, bg="white", fg="blue")
+AA_Label = tk.Label(Upper_DCM_Frame, text="Atrial\nAmplitude")
 
-VA_input = tk.Entry(DCM_Frame, width=10, bg="white", fg="blue")
-VA_Label = tk.Label(DCM_Frame, text="Ventricular\nAmplitude")
+APW_input = tk.Entry(Upper_DCM_Frame, width=10, bg="white", fg="blue")
+APW_Label = tk.Label(Upper_DCM_Frame, text="Atrial\nPulse Width")
 
-VPW_input = tk.Entry(DCM_Frame, width=10, bg="white", fg="blue")
-VPW_Label = tk.Label(DCM_Frame, text="Ventricular\nPulse Width")
+VA_input = tk.Entry(Upper_DCM_Frame, width=10, bg="white", fg="blue")
+VA_Label = tk.Label(Upper_DCM_Frame, text="Ventricular\nAmplitude")
 
-AS_input = tk.Entry(DCM_Frame, width=10, bg="white", fg="blue")
-AS_Label = tk.Label(DCM_Frame, text="Atrial\nSensitivity")
+VPW_input = tk.Entry(Upper_DCM_Frame, width=10, bg="white", fg="blue")
+VPW_Label = tk.Label(Upper_DCM_Frame, text="Ventricular\nPulse Width")
 
-PVARP_input = tk.Entry(DCM_Frame, width=10, bg="white", fg="blue")
-PVARP_Label = tk.Label(DCM_Frame, text="PVARP")
+AS_input = tk.Entry(Upper_DCM_Frame, width=10, bg="white", fg="blue")
+AS_Label = tk.Label(Upper_DCM_Frame, text="Atrial\nSensitivity")
 
-H_input = tk.Entry(DCM_Frame, width=10, bg="white", fg="blue")
-H_Label = tk.Label(DCM_Frame, text="Hysteresis")
+VS_input = tk.Entry(Upper_DCM_Frame, width=10, bg="white", fg="blue")
+VS_Label = tk.Label(Upper_DCM_Frame, text="Vetricular\nSensitivity")
 
-RS_input = tk.Entry(DCM_Frame, width=10, bg="white", fg="blue")
-RS_Label = tk.Label(DCM_Frame, text="Rate\nSmoothing")
+ARP_input = tk.Entry(Upper_DCM_Frame, width=10, bg="white", fg="blue")
+ARP_Label = tk.Label(Upper_DCM_Frame, text="ARP")
 
-MSR_input = tk.Entry(DCM_Frame, width=10, bg="white", fg="blue")
-MSR_Label = tk.Label(DCM_Frame, text="Maximum\nSensor Rate")
+VRP_input = tk.Entry(Upper_DCM_Frame, width=10, bg="white", fg="blue")
+VRP_Label = tk.Label(Upper_DCM_Frame, text="VRP")
 
-Save_Button = tk.Button(DCM_Frame, text="Save", width=8 )#command=Save_Parameters)
+PVARP_input = tk.Entry(Upper_DCM_Frame, width=10, bg="white", fg="blue")
+PVARP_Label = tk.Label(Upper_DCM_Frame, text="PVARP")
 
-AOO_Button = tk.Button(DCM_Frame, text="AOO", padx=10, pady=5, width=8, command= lambda: user_manager.Change_Parameters("AOO"))
-AAI_Button = tk.Button(DCM_Frame, text="AAI", padx=10, pady=5, width=8, command= lambda: user_manager.Change_Parameters("AAI"))
-VOO_Button = tk.Button(DCM_Frame, text="VOO", padx=10, pady=5, width=8, command= lambda: user_manager.Change_Parameters("VOO"))
-VVI_Button = tk.Button(DCM_Frame, text="VVI", padx=10, pady=5, width=8, command= lambda: user_manager.Change_Parameters("VVI"))
+H_input = tk.Entry(Upper_DCM_Frame, width=10, bg="white", fg="blue")
+H_Label = tk.Label(Upper_DCM_Frame, text="Hysteresis")
 
-AOOR_Button = tk.Button(DCM_Frame, text="AOOR", padx=10, pady=5, width=8, command= lambda: user_manager.Change_Parameters("AOOR"))
-AAIR_Button = tk.Button(DCM_Frame, text="AAIR", padx=10, pady=5, width=8, command= lambda: user_manager.Change_Parameters("AAIR"))
-VOOR_Button = tk.Button(DCM_Frame, text="VOOR", padx=10, pady=5, width=8, command= lambda: user_manager.Change_Parameters("VOOR"))
-VVIR_Button = tk.Button(DCM_Frame, text="VVIR", padx=10, pady=5, width=8, command= lambda: user_manager.Change_Parameters("VVIR"))
+RS_input = tk.Entry(Upper_DCM_Frame, width=10, bg="white", fg="blue")
+RS_Label = tk.Label(Upper_DCM_Frame, text="Rate\nSmoothing")
+
+MSR_input = tk.Entry(Upper_DCM_Frame, width=10, bg="white", fg="blue")
+MSR_Label = tk.Label(Upper_DCM_Frame, text="Maximum\nSensor Rate")
+
+Save_Button = tk.Button(Lower_DCM_Frame, text="Save", width=10, height=4 )#command=Save_Parameters)
+
+AOO_Button = tk.Button(Lower_DCM_Frame, text="AOO", padx=10, pady=5, width=8, height=1, command= lambda: Change_Parameters("AOO"))
+AAI_Button = tk.Button(Lower_DCM_Frame, text="AAI", padx=10, pady=5, width=8, height=1, command= lambda: Change_Parameters("AAI"))
+VOO_Button = tk.Button(Lower_DCM_Frame, text="VOO", padx=10, pady=5, width=8, height=1, command= lambda: Change_Parameters("VOO"))
+VVI_Button = tk.Button(Lower_DCM_Frame, text="VVI", padx=10, pady=5, width=8, height=1, command= lambda: Change_Parameters("VVI"))
+
+AOOR_Button = tk.Button(Lower_DCM_Frame, text="AOOR", padx=10, pady=5, width=8, height=1, command= lambda: Change_Parameters("AOOR"))
+AAIR_Button = tk.Button(Lower_DCM_Frame, text="AAIR", padx=10, pady=5, width=8, height=1, command= lambda: Change_Parameters("AAIR"))
+VOOR_Button = tk.Button(Lower_DCM_Frame, text="VOOR", padx=10, pady=5, width=8, height=1, command= lambda: Change_Parameters("VOOR"))
+VVIR_Button = tk.Button(Lower_DCM_Frame, text="VVIR", padx=10, pady=5, width=8, height=1, command= lambda: Change_Parameters("VVIR"))
 
 
 
@@ -94,37 +159,36 @@ def on_Login():
     user_manager.loginUser(Username_input.get(), Password_input.get())
     for widget in Welcome_Frame.winfo_children():
         widget.grid_forget()
-        print("clearing")
     DCM_Frame.grid(row=0, column=0)
-    LRL_input.grid(row=0, column=0, columnspan=1, padx=10, pady=10)
-    LRL_Label.grid(row=1, column=0, columnspan=1, padx=10, pady=10)
-    URL_input.grid(row=0, column=1, columnspan=1, padx=10, pady=10)
-    URL_Label.grid(row=1, column=1, columnspan=1, padx=10, pady=10)
-    AA_input.grid(row=0, column=2, columnspan=1, padx=10, pady=10)
-    AA_Label.grid(row=1, column=2, columnspan=1, padx=10, pady=10)
-    Save_Button.grid(row=5, column=4, rowspan=2)
-    AOO_Button.grid(row=6, column=0)
-    AAI_Button.grid(row=5, column=0)
-    VOO_Button.grid(row=6, column=1)
-    VVI_Button.grid(row=5, column=1)
-    AOOR_Button.grid(row=6, column=2)
-    AAIR_Button.grid(row=5, column=2)
-    VOOR_Button.grid(row=6, column=3)
-    VVIR_Button.grid(row=5, column=3)
+    Upper_DCM_Frame.grid(row=0,column=0)
+    Lower_DCM_Frame.grid(row=1,column=0)
+    Change_Parameters("AOO")
+    Save_Button.grid(row=0, column=4, rowspan=2)
+    AOO_Button.grid(row=1, column=0)
+    AAI_Button.grid(row=0, column=0)
+    VOO_Button.grid(row=1, column=1)
+    VVI_Button.grid(row=0, column=1)
+    AOOR_Button.grid(row=1, column=2)
+    AAIR_Button.grid(row=0, column=2)
+    VOOR_Button.grid(row=1, column=3)
+    VVIR_Button.grid(row=0, column=3)
     # VA_input.grid(row=0, column=3, columnspan=1, padx=10, pady=10)
     # VA_Label.grid(row=1, column=3, columnspan=1, padx=10, pady=10)
     # VPW_input.grid(row=0, column=4, columnspan=1, padx=10, pady=10)
     # VPW_Label.grid(row=1, column=4, columnspan=1, padx=10, pady=10)
     # AS_input.grid(row=2, column=0, columnspan=1, padx=10, pady=10)
     # AS_Label.grid(row=3, column=0, columnspan=1, padx=10, pady=10)
+    # ARP_input.grid(row=2, column=1, columnspan=1, padx=10, pady=0)
+    # ARP_Label.grid(row=3, column=1, columnspan=1, padx=10, pady=0)
     # PVARP_input.grid(row=2, column=1, columnspan=1, padx=10, pady=0)
-    # H_input.grid(row=2, column=2, columnspan=1, padx=10, pady=0)
-    # RS_input.grid(row=2, column=3, columnspan=1, padx=10, pady=0)
-    # MSR_input.grid(row=2, column=4, columnspan=1, padx=10, pady=0)
     # PVARP_Label.grid(row=3, column=1, columnspan=1, padx=10, pady=0)
     # H_Label.grid(row=3, column=2, columnspan=1, padx=10, pady=0)
+    # H_input.grid(row=2, column=2, columnspan=1, padx=10, pady=0)
+    # RS_input.grid(row=2, column=3, columnspan=1, padx=10, pady=0)
     # RS_Label.grid(row=3, column=3, columnspan=1, padx=10, pady=0)
+    # MSR_input.grid(row=2, column=4, columnspan=1, padx=10, pady=0)
     # MSR_Label.grid(row=3, column=4, columnspan=1, padx=10, pady=0)
+
 
 Welcome_Label = tk.Label(Welcome_Frame, text="Welcome!").grid(pady=10, row=0,column=0,  columnspan=2)
 #Welcome_Label.pack(pady=10)

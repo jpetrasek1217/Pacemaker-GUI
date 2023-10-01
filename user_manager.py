@@ -1,6 +1,9 @@
 from typing import Optional
 from user import User
 import local_storage
+import tkinter
+from GUI import root
+from tkinter import messagebox 
 
 
 _MAX_USERS_SAVED = int(10)
@@ -29,6 +32,7 @@ def registerUser(username: str, password: str) -> None:
         newUser = User(username, password)
         _users.append(newUser)
         local_storage.writeUsersToFile(_users)
+        messagebox.showinfo("Create an Account", "Successfully created account.")
 
 
 def deleteUser(username: str) -> None:
