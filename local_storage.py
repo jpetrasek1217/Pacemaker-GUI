@@ -1,20 +1,21 @@
 import json
 from user import User
 
-_USERS_FILEPATH = "users.json"
-_USERNAME_KEY = "username"
-_PASSWORD_KEY = "password"
-_PARAMS_KEY = "parameters"
+_USERS_FILEPATH = "local_storage/users.json"
+_USERNAME_KEY = "USERNAME"
+_PASSWORD_KEY = "PASSWORD"
+_PACINGMODE_KEY = "PACING_MODE"
+_PARAMS_KEY = "PARAMETERS"
 
 def readUsersFromFile() -> list[User]:
     users = []
     userDictList = _readFromJSONFile(_USERS_FILEPATH)
     for userDict in userDictList:
-        username = userDict[_USERNAME_KEY]
-        password = userDict[_PASSWORD_KEY]
-        parameters = userDict[_PARAMS_KEY]
-        user = User(username, password)
-        user.setAllParameters(parameters)
+        usernameStr = userDict[_USERNAME_KEY]
+        passwordStr = userDict[_PASSWORD_KEY]
+        pacingModeStr = userDict[_PACINGMODE_KEY]
+        parametersDict = userDict[_PARAMS_KEY]
+        user = User(usernameStr, passwordStr, pacingModeStr, parametersDict)
         users.append(user)
     return users
 
@@ -31,7 +32,8 @@ def writeUsersToFile(users: list[User]) -> None:
         userDict = {}
         userDict[_USERNAME_KEY] = user.getUsername()
         userDict[_PASSWORD_KEY] = user.getPassword()
-        userDict[_PARAMS_KEY] = user.getAllParameters()
+        userDict[_PACINGMODE_KEY] = user.getPacingMode()
+        userDict[_PARAMS_KEY] = user.getAllParameterValues()
         userDictList.append(userDict)
     _writeToJSONFile(_USERS_FILEPATH, userDictList)
 
