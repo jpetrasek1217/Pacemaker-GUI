@@ -6,15 +6,16 @@ class Parameters(Enum):
     UPPER_RATE_LIMIT = "Upper Rate Limit", "ppm", 120.0, 50.0, 175.0
     ATRIAL_AMPLITUDE = "Atrial Amplitude", "V", 3.5, 0.5, 7.0, 0.0
     ATRIAL_PULSE_WIDTH = "Atrial Pulse Width", "ms", 0.4, 0.1, 1.9, 0.05
-    ATRIAL_REFACTORY_PERIOD = "Atrial Refractory Period", "ms", 250, 150, 500
+    ATRIAL_REFACTORY_PERIOD = "Atrial Refractory Period", "ms", 250.0, 150.0, 500.0
     ATRIAL_SENSITIVITY = "Atrial Sensitivity", "mV", 0.75, 1.0, 10.0, 0.25, 0.5, 0.75
     VENTRICULAR_AMPLITUDE = "Ventricular Amplitude", "V", 3.5, 0.5, 7.0, 0.0
     VENTRICULAR_PULSE_WIDTH = "Ventricular Pulse Width", "ms", 0.4, 0.1, 1.9, 0.05
-    VENTRICULAR_REFACTORY_PERIOD = "Ventricular Refractory Period", "ms", 320, 150, 500
+    VENTRICULAR_REFACTORY_PERIOD = "Ventricular Refractory Period", "ms", 320.0, 150.0, 500.0
     VENTRICULAR_SENSITIVITY = "Ventricular Sensitivity", "mV", 2.5, 1.0, 10.0, 0.25, 0.5, 0.75
-    PVARP = "PVARP", "ms", 250, 150, 500
+    PVARP = "PVARP", "ms", 250.0, 150.0, 500.0
     HYSTERESIS = "Hysteresis", "ms", 0.0, 30.0, 175.0, 0.0
     RATE_SMOOTHING = "Rate Smoothing", "%", 0.0, 3.0, 25.0, 0.0
+    MAX_SENSOR_RATE = "Max Sensor Rate", "ppm", 120.0, 50.0, 175.0
 
     def __init__(self, title: str, units: str, nominalValue: float, lowerLimit: float, upperLimit: float, *args: float) -> None:
         super().__init__()

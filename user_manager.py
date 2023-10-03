@@ -110,6 +110,28 @@ def getSavedParameterValue(param: str | Parameters) -> float:
     return _activeUser.getParameterValue(param)
 
 
+def getAllSavedParametersAndVisibilityFromSavedPacingMode() -> list[tuple[str, float, bool]]:
+    # Returns list of (Param Name, Saved Param Value, is Param Visible)
+    listOfParamObjs = PacingModes.getAllVisibleParameters(_activeUser.getPacingMode())
+    listOfParams = []
+    for paramObj in listOfParamObjs:
+        listOfParams.append((paramObj.getTitle(), 
+                            _activeUser.getParameterValue(paramObj.getName()),
+                            _isParameterVisible(paramObj.getName()),
+                            ))
+    return listOfParams
+
+    
+def _isParameterVisible(param: str) -> bool:
+    if isinstance(param, Parameters):
+        param = param.getName()
+    listOfParamObjs = PacingModes[_activeUser.getPacingMode()].getParameters()
+    for paramObj in listOfParamObjs:
+        if param == paramObj.getName():
+            return True
+    return False
+
+
 def saveParameterValue(param: str | Parameters, value: float) -> tuple[bool, str]:
     if isinstance(param, Parameters):
         param = param.getName()
@@ -123,21 +145,6 @@ def saveParameterValue(param: str | Parameters, value: float) -> tuple[bool, str
     return True, ""
 
 
-def getAllSavedParameterValues(pacingMode: str | PacingModes) -> list[tuple[str, float]]:
-    if isinstance(pacingMode, PacingModes):
-        pacingMode = pacingMode.getName()
-
-    listOfParamObjs = PacingModes[pacingMode].getParameters()
-    listOfParams = []
-    for paramObj in listOfParamObjs:
-        listOfParams.append((paramObj.getTitle(), _activeUser.getParameterValue(paramObj.getName())))
-    return listOfParams
-
-
-def getAllSavedParameterValuesFromSavedPacingMode() -> list[tuple[str, float]]:
-    return getAllSavedParameterValues(_activeUser.getPacingMode())
-
-
 def _validateParameterValue(param: str, value: float) -> tuple[bool, str]:
     paramObj = Parameters[param]
     if not isinstance(value, float):
@@ -146,3 +153,6 @@ def _validateParameterValue(param: str, value: float) -> tuple[bool, str]:
         return False, f"Invalid value of \'{value}\' for Parameter \'{paramObj.getTitle()}\'.\n{paramObj.getAcceptableValuesString()}"
     else:
         return True, ""
+
+    
+getAllSavedParametersAndVisibilityFromSavedPacingMode()
