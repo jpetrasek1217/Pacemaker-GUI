@@ -1,8 +1,5 @@
 import tkinter as tk
-#from pacing_modes import Parameters
-#from pacing_modes import PacingModes
 import user_manager 
-from tkinter import messagebox
 import GUI_helpers
 
 
@@ -17,6 +14,9 @@ DCM_Frame = tk.Frame(root)
 Lower_DCM_Frame = tk.Frame(DCM_Frame)
 Upper_DCM_Frame = tk.Frame(DCM_Frame)
 
+
+# parameterEntryAndLabelList consists of sublists: [paramName, paramEntry, paramLabel]
+parameterEntryAndLabelList = []
 
 
 """
@@ -67,6 +67,13 @@ def Logout():
 
 
 def Change_Parameters(mode):
+    user_manager.savePacingMode(mode)
+    for widget in Upper_DCM_Frame.winfo_children():
+        widget.grid_forget()
+    DCM_Frame.grid_forget()
+    createAllDCMItems()
+
+    '''
     SetInputState(input_list, "normal")
     if mode == "AAIR" or mode == "AOOR" or mode == "VVIR" or mode == "VOOR":
         SetInputState(input_list, "disabled")
@@ -133,35 +140,54 @@ def Change_Parameters(mode):
         VRP_Label.grid(row=4, column=1, columnspan=1, padx=10, pady=0)
         MSR_input.config(state="disabled")
         PVARP_input.config(state="disabled")
-    
+     '''
 
 
-def Save_Parameters():
-    pass
+def onSaveParameters():
+    for paramEntryAndLabel in parameterEntryAndLabelList:
+        paramName = paramEntryAndLabel[0]
+        paramEntry = paramEntryAndLabel[1]
 
+        isSuccessfulSave, errorMsg = user_manager.saveParameterValue(paramName, paramEntry.get())
+        if not isSuccessfulSave:
+            GUI_helpers.throwErrorPopup(errorMsg)
+            return
 
-input_list = []
 
 def createAllDCMItems():
-    for nameAndValues in user_manager.getAllSavedParameterValues():
-        print(nameAndValues)
-        singleParam = []
-        singleParam.append(tk.Entry(Upper_DCM_Frame, width=10, bg="white", fg="blue"))
-        singleParam.append(tk.Label(Upper_DCM_Frame, text=nameAndValues[0]))
-        input_list.append(singleParam)
+    global parameterEntryAndLabelList
+    parameterEntryAndLabelList = []
+    for parameter in user_manager.getAllSavedParametersAndVisibilityFromSavedPacingMode():
+        paramName = parameter[0]
+        paramTitle = parameter[1]
+        paramValue = parameter[2]
+        paramVisibility = parameter[3]
+
+        entry = tk.Entry(Upper_DCM_Frame, width=10, bg="white", fg="blue")
+        entry.insert(0, paramValue)
+        if not paramVisibility:
+            entry.config(state="disabled")
+
+        label = tk.Label(Upper_DCM_Frame, text=paramTitle)
+      
+        parameterEntryAndLabelList.append([paramName, entry, label])
+    
     DCM_Frame.grid(row=0, column=0, pady=25, padx=25, sticky="nsew")
     Upper_DCM_Frame.grid(row=0,column=0)
     Title_Label = tk.Label(Upper_DCM_Frame, text="Please choose a parameter")
     Title_Label.grid(row=0,column=0, columnspan=5, padx=10, pady=10, sticky="w")
-    rowNum = 0
-    for rowItem in range(2):
-        rowNum = rowNum + 1
+
+    for row in range(2):
         for col in range(5):
-            for LabelOrInput in range(2):
-                input_list[col][LabelOrInput].grid(row = str(rowNum+LabelOrInput), column=col, padx=10, pady=10)
-
-
-
+            index = row * 5 + col
+            if index >= len(parameterEntryAndLabelList):
+                break;
+            parameterEntryAndLabelList[index][1].grid(row = 2*row + 1, column=col, padx=10, pady=10)
+            parameterEntryAndLabelList[index][2].grid(row = 2*row + 2, column=col, padx=10, pady=10)
+        else:
+            continue    # only executed if the inner loop did NOT break
+        break           # only executed if the inner loop DID break
+            
 
 def on_Login():
     isSuccessfulLogin, errorMsg = user_manager.loginUser(Username_input.get(), Password_input.get())
@@ -214,7 +240,8 @@ def on_Login():
 
     
 
-    Change_Parameters("AOO")
+    #Change_Parameters("AOO")
+
     # VA_input.grid(row=0, column=3, columnspan=1, padx=10, pady=10)
     # VA_Label.grid(row=1, column=3, columnspan=1, padx=10, pady=10)
     # VPW_input.grid(row=0, column=4, columnspan=1, padx=10, pady=10)
@@ -235,7 +262,6 @@ def on_Login():
 
 
 def Start():
-    print("here")
     Welcome_Frame.grid(row=0, column=0, pady=25, padx=25)
     Welcome_Label.grid(pady=10, row=0,column=0, columnspan=2)
     #Welcome_Label.pack(pady=10)
@@ -284,7 +310,7 @@ CreateUser_button = tk.Button(Welcome_Frame, text="Create New User", padx=10, pa
 
         
     
-
+'''
 
 LRL_input = tk.Entry(Upper_DCM_Frame, width=10, bg="white", fg="blue")
 LRL_Label = tk.Label(Upper_DCM_Frame, text="Lower\nRate Limit")
@@ -328,7 +354,9 @@ RS_Label = tk.Label(Upper_DCM_Frame, text="Rate\nSmoothing")
 MSR_input = tk.Entry(Upper_DCM_Frame, width=10, bg="white", fg="blue")
 MSR_Label = tk.Label(Upper_DCM_Frame, text="Maximum\nSensor Rate")
 
-Save_Button = tk.Button(Lower_DCM_Frame, text="Save", width=10, height=4, command=Save_Parameters)
+'''
+
+Save_Button = tk.Button(Lower_DCM_Frame, text="Save", width=10, height=4, command=onSaveParameters)
 logout_button = tk.Button(Upper_DCM_Frame, text="Logout", command=Logout)
 
 AOO_Button = tk.Button(Lower_DCM_Frame, text="AOO", padx=10, pady=5, width=8, height=1, command= lambda: Change_Parameters("AOO"))
@@ -341,6 +369,7 @@ AAIR_Button = tk.Button(Lower_DCM_Frame, text="AAIR", padx=10, pady=5, width=8, 
 VOOR_Button = tk.Button(Lower_DCM_Frame, text="VOOR", padx=10, pady=5, width=8, height=1, command= lambda: Change_Parameters("VOOR"))
 VVIR_Button = tk.Button(Lower_DCM_Frame, text="VVIR", padx=10, pady=5, width=8, height=1, command= lambda: Change_Parameters("VVIR"))
 
+'''
 input_list = [LRL_input,
                 URL_input,
                 AA_input,
@@ -359,7 +388,7 @@ input_list = [LRL_input,
 A_only = [AA_input, AA_Label, APW_input, APW_Label, AS_input, AS_Label, ARP_input, ARP_Label]
 
 V_only = [VA_input, VA_Label, VPW_input, VPW_Label, VS_input, VS_Label, VRP_input, VRP_Label]
-
+'''
 
 Start()
 

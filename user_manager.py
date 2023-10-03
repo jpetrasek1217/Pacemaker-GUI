@@ -110,12 +110,13 @@ def getSavedParameterValue(param: str | Parameters) -> float:
     return _activeUser.getParameterValue(param)
 
 
-def getAllSavedParametersAndVisibilityFromSavedPacingMode() -> list[tuple[str, float, bool]]:
-    # Returns list of (Param Name, Saved Param Value, is Param Visible)
+def getAllSavedParametersAndVisibilityFromSavedPacingMode() -> list[tuple[str, str, float, bool]]:
+    # Returns list of (Param Name, Param Title, Saved Param Value, is Param Visible)
     listOfParamObjs = PacingModes.getAllVisibleParameters(_activeUser.getPacingMode())
     listOfParams = []
     for paramObj in listOfParamObjs:
-        listOfParams.append((paramObj.getTitle(), 
+        listOfParams.append((paramObj.getName(),
+                             paramObj.getTitle(), 
                             _activeUser.getParameterValue(paramObj.getName()),
                             _isParameterVisible(paramObj.getName()),
                             ))
@@ -135,12 +136,12 @@ def _isParameterVisible(param: str) -> bool:
 def saveParameterValue(param: str | Parameters, value: float) -> tuple[bool, str]:
     if isinstance(param, Parameters):
         param = param.getName()
-    
+
     isValidParamValue, errorMsg = _validateParameterValue(param, value)
     if(not isValidParamValue):
         return False, errorMsg
     
-    _activeUser.setParameterValue(param, value)
+    _activeUser.setParameterValue(param, float(value))
     local_storage.writeUsersToFile(_users)
     return True, ""
 
@@ -148,11 +149,12 @@ def saveParameterValue(param: str | Parameters, value: float) -> tuple[bool, str
 def _validateParameterValue(param: str, value: float) -> tuple[bool, str]:
     paramObj = Parameters[param]
     if not isinstance(value, float):
-        return False, f"Please enter a floating point number for Parameter \'{paramObj.getTitle()}\'."
+        try:
+            float(value)
+            return True, ""
+        except ValueError:
+                return False, f"Please enter a floating point number for Parameter \'{paramObj.getTitle()}\'."
     elif not paramObj.isAcceptableValue(value):
         return False, f"Invalid value of \'{value}\' for Parameter \'{paramObj.getTitle()}\'.\n{paramObj.getAcceptableValuesString()}"
     else:
         return True, ""
-
-    
-getAllSavedParametersAndVisibilityFromSavedPacingMode()
