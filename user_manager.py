@@ -53,6 +53,12 @@ def registerUser(username: str, password: str) -> tuple[bool, str]:
     return True, ""
 
 
+def logoutUser() -> tuple[bool, str]:
+    global _activeUser
+    _activeUser = None
+    return True, ""
+
+
 def deleteUser(username: str) -> tuple[bool, str]:
     user = _findUser(username)                          # Checks that user exists
     userExists = isinstance(user, User)
