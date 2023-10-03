@@ -1,26 +1,26 @@
+from enum import Enum
 import re
 import local_storage
+from pacemaker_pacingmodes import PacingModes
+from pacemaker_parameters import Parameters
 from user import User
-from typing import Optional
 
 
 _MAX_USERS_SAVED = int(10)
 _REGEX_VALID_CHARS = "^[a-zA-Z0-9]*$"
 
 _users: list[User] = local_storage.readUsersFromFile()
-_activeUser: Optional[User] = None
+_activeUser: User | None = None
 
 
-def getActiveUser() -> Optional[User]:
-    return _activeUser
-
+# --- Login, Register, Delete Users ---
 
 def loginUser(username: str, password: str) -> tuple[bool, str]:
     usernameFormatted = username.strip()
     passwordFormatted = password.strip()
 
-    returnSuccess, errorMsg = _validateUsernamePasswordInputs(usernameFormatted, passwordFormatted)
-    if(not returnSuccess):
+    isValidUsernamePassword, errorMsg = _validateUsernamePasswordInputs(usernameFormatted, passwordFormatted)
+    if(not isValidUsernamePassword):
         return False, errorMsg
     
     user = _findUser(usernameFormatted)     # Checks that user exists
@@ -40,15 +40,15 @@ def registerUser(username: str, password: str) -> tuple[bool, str]:
     usernameFormatted = username.strip()
     passwordFormatted = password.strip()
 
-    returnSuccess, errorMsg = _validateUsernamePasswordInputs(usernameFormatted, passwordFormatted)
-    if(not returnSuccess):
+    isValidUsernamePassword, errorMsg = _validateUsernamePasswordInputs(usernameFormatted, passwordFormatted)
+    if(not isValidUsernamePassword):
         return False, errorMsg
     
     usernameAvaliable = not isinstance(_findUser(usernameFormatted), User)   # Check if username is avaliable
     if not usernameAvaliable:                               
         return False, f"Username \'{usernameFormatted}\' already exists."
     
-    newUser = User(usernameFormatted, passwordFormatted)    # If username is avaliable, create new user and save user locally
+    newUser = User(usernameFormatted, passwordFormatted, PacingModes.getInitialPacingMode(), Parameters.getNominalValues())    # If username is avaliable, create new user and save user locally
     _users.append(newUser)
     local_storage.writeUsersToFile(_users)
     return True, ""
@@ -64,7 +64,7 @@ def deleteUser(username: str) -> tuple[bool, str]:
     local_storage.writeUsersToFile(_users)
 
 
-def _findUser(username: str) -> Optional[User]:         # Finds user with matching username, returns user
+def _findUser(username: str) -> User | None:         # Finds user with matching username, returns user
     for user in _users:
         if not isinstance(user, User):
             raise TypeError
@@ -82,5 +82,54 @@ def _validateUsernamePasswordInputs(username: str, password: str) -> tuple[bool,
         return False, "Invalid password. Please fill in all required fields."
     elif(not re.search(_REGEX_VALID_CHARS, password)):
         return False, "Invalid password. Please only use charaters from A-Z, a-z and 0-9."
+    else:
+        return True, ""
+    
+
+# --- Set & Get Parameters from Active User ---
+
+def getActiveUserUsername() -> str:
+    return _activeUser.getUsername()
+
+
+def getPacingMode() -> str:
+    return _activeUser.getPacingMode()
+
+
+def savePacingMode(pacingMode: str | PacingModes) -> tuple[bool, str]:
+    if isinstance(pacingMode, PacingModes):
+        pacingMode = pacingMode.getName()
+
+    _activeUser.setPacingMode(pacingMode)
+    local_storage.writeUsersToFile(_users)
+    return True, ""
+
+
+def getParameterValue(param: str | Parameters) -> float:
+    if isinstance(param, Parameters):
+        param = param.getName()
+    return _activeUser.getParameterValue(param)
+
+
+def saveParameterValue(param: str | Parameters, value: float) -> tuple[bool, str]:
+    if isinstance(param, Parameters):
+        param = param.getName()
+    
+    isValidParamValue, errorMsg = _validateParameterValue(param, value)
+    if(not isValidParamValue):
+        return False, errorMsg
+    
+    _activeUser.setParameterValue(param, value)
+    local_storage.writeUsersToFile(_users)
+    return True, ""
+
+
+
+def _validateParameterValue(param: str, value: float) -> tuple[bool, str]:
+    paramObj = Parameters[param]
+    if not isinstance(value, float):
+        return False, f"Please enter a floating point number for Parameter \'{paramObj.getTitle()}\'."
+    elif not paramObj.isAcceptableValue(value):
+        return False, f"Invalid value of \'{value}\' for Parameter \'{paramObj.getTitle()}\'.\n{paramObj.getAcceptableValuesString()}"
     else:
         return True, ""

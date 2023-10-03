@@ -1,3 +1,4 @@
 # Editor directories and files
 .vscode/*
 __pycache__/*
+local_storage/*

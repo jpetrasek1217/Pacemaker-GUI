@@ -1,25 +1,8 @@
 from enum import Enum
+from pacemaker_parameters import Parameters
 
 
-class Parameters(str, Enum):
-    LOWER_RATE_LIMIT = "lowerRateLimit"
-    UPPER_RATE_LIMIT = "upperRateLimit"
-    ATRIAL_AMPLITUDE = "atrialAmplitude"
-    ATRIAL_PULSE_WIDTH = "atrialPulseWidth"
-    ATRIAL_REFACTORY_PERIOD = "atrialRefractoryPeriod"
-    ATRIAL_SENSITIVITY = "atrialSensitivity"
-    VENTRICULAR_AMPLITUDE = "ventricularAmplitude"
-    VENTRICULAR_PULSE_WIDTH = "ventricularPulseWidth"
-    VENTRICULAR_REFACTORY_PERIOD = "ventricularRefractoryPeriod"
-    VENTRICULAR_SENSITIVITY = "ventricularSensitivity"
-    PVARP = "PVARP"
-    HYSTERESIS = "hysteresis"
-    RATE_SMOOTHING = "rateSmoothing"
-
-
-# Pacing Modes
-
-class PacingModes(list[Parameters], Enum):
+class PacingModes(Enum):
     AOO = [
         Parameters.LOWER_RATE_LIMIT,
         Parameters.UPPER_RATE_LIMIT,
@@ -56,14 +39,22 @@ class PacingModes(list[Parameters], Enum):
         Parameters.HYSTERESIS,
         Parameters.RATE_SMOOTHING,
     ]
+
+    def __init__(self, listOfParameters: list[Parameters]) -> None:
+        super().__init__()
+        self._params = listOfParameters
+        self._checkValues()
+
+    def _checkValues(self) -> None:
+        if any(not isinstance(param, Parameters) for param in self._params):
+            raise TypeError(f"Pacing Mode \'{self.name}\' has objects that are not a Parameter.")
+        
+    def getName(self) -> str:
+        return self.name
+
+    def getParameters(self) -> list[Parameters]:
+        return self._params
     
-
-# Parameter Key Error when key is not a
-
-class ParameterKeyError(KeyError):
-    def __init__(self, key, *args):
-        super().__init__(args)
-        self.key = key
-
-    def __str__(self):
-        return f"The key {self.key} is not in a valid Parameter."
+    @classmethod
+    def getInitialPacingMode(self) -> str:
+        return PacingModes.AOO.name
