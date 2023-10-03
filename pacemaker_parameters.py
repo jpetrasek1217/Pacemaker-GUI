@@ -1,6 +1,5 @@
 from enum import Enum
 
-
 class Parameters(Enum):
     # PARAMETER_NAME = "title", "units", nominalValue, lowerLimit, upperLimit, *additionalAcceptableValues
     LOWER_RATE_LIMIT = "Lower Rate Limit", "ppm", 60.0, 30.0, 175.0

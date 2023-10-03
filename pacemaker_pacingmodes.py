@@ -1,7 +1,6 @@
 from enum import Enum
 from pacemaker_parameters import Parameters
 
-
 class PacingModes(Enum):
     AOO = [
         Parameters.LOWER_RATE_LIMIT,

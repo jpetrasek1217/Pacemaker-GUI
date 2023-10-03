@@ -1,5 +1,4 @@
-from enum import Enum
-import re
+import re   #regex
 import local_storage
 from pacemaker_pacingmodes import PacingModes
 from pacemaker_parameters import Parameters
@@ -105,7 +104,7 @@ def savePacingMode(pacingMode: str | PacingModes) -> tuple[bool, str]:
     return True, ""
 
 
-def getParameterValue(param: str | Parameters) -> float:
+def getSavedParameterValue(param: str | Parameters) -> float:
     if isinstance(param, Parameters):
         param = param.getName()
     return _activeUser.getParameterValue(param)
@@ -123,6 +122,20 @@ def saveParameterValue(param: str | Parameters, value: float) -> tuple[bool, str
     local_storage.writeUsersToFile(_users)
     return True, ""
 
+
+def getAllSavedParameterValues(pacingMode: str | PacingModes) -> list[tuple[str, float]]:
+    if isinstance(pacingMode, PacingModes):
+        pacingMode = pacingMode.getName()
+
+    listOfParamObjs = PacingModes[pacingMode]
+    listOfParams = []
+    for paramObj in listOfParamObjs:
+        listOfParams.append(tuple(paramObj.getTitle(), _activeUser.getParameterValue(paramObj.getName())))
+    return listOfParams
+
+
+def getAllSavedParameterValuesFromSavedPacingMode() -> list[tuple[str, float]]:
+    return getAllSavedParameterValues(_activeUser.getPacingMode())
 
 
 def _validateParameterValue(param: str, value: float) -> tuple[bool, str]:
