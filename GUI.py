@@ -3,6 +3,7 @@ import tkinter as tk
 #from pacing_modes import PacingModes
 import user_manager 
 from tkinter import messagebox
+import GUI_helpers
 
 
 root = tk.Tk()
@@ -139,7 +140,10 @@ def Change_Parameters(mode):
 
 
 def on_Login():
-    user_manager.loginUser(Username_input.get(), Password_input.get())
+    isSuccessfulLogin, errorMsg = user_manager.loginUser(Username_input.get(), Password_input.get())
+    if not isSuccessfulLogin:
+         GUI_helpers.throwErrorPopup(errorMsg)
+         return
     for widget in Welcome_Frame.winfo_children():
         widget.grid_forget()
     Welcome_Frame.grid_forget()
@@ -199,6 +203,8 @@ def on_Login():
     # MSR_input.grid(row=2, column=4, columnspan=1, padx=10, pady=0)
     # MSR_Label.grid(row=3, column=4, columnspan=1, padx=10, pady=0)
 
+
+
 def Start():
     print("here")
     Welcome_Frame.grid(row=0, column=0, pady=25, padx=25)
@@ -220,6 +226,12 @@ def Start():
     #CreateUser_button.pack(pady=10)
     return
 
+def on_registerUser():
+    isSuccessfulRegister, errorMsg = user_manager.registerUser(Username_input.get(), Password_input.get())
+    if isSuccessfulRegister:
+         GUI_helpers.throwSuccessPopup(f"Successfully Created New User \'{Username_input.get().strip()}\'")
+    else:
+         GUI_helpers.throwErrorPopup(errorMsg)
 
 Welcome_Label = tk.Label(Welcome_Frame, text="Welcome!")
 Prompt_Label = tk.Label(Welcome_Frame, text="Please login or create a new user")
@@ -228,7 +240,7 @@ Username_input = tk.Entry(Welcome_Frame, width=20, bg="white", fg="blue")
 Password_Label = tk.Label(Welcome_Frame, text="Password")
 Password_input = tk.Entry(Welcome_Frame, width=20, bg="white", fg="blue", show="*")
 Login_button = tk.Button(Welcome_Frame, text="LOGIN", padx=10, pady=5, command=on_Login)
-CreateUser_button = tk.Button(Welcome_Frame, text="Create New User", padx=10, pady=5, command=lambda: user_manager.registerUser(Username_input.get(), Password_input.get()))
+CreateUser_button = tk.Button(Welcome_Frame, text="Create New User", padx=10, pady=5, command= on_registerUser)
 
 
 LRL_input = tk.Entry(Upper_DCM_Frame, width=10, bg="white", fg="blue")
