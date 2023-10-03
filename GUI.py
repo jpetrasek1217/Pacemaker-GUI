@@ -136,6 +136,30 @@ def Change_Parameters(mode):
     
 
 
+def Save_Parameters():
+    pass
+
+
+input_list = []
+
+def createAllDCMItems():
+    for nameAndValues in user_manager.getAllSavedParameterValues():
+        print(nameAndValues)
+        singleParam = []
+        singleParam.append(tk.Entry(Upper_DCM_Frame, width=10, bg="white", fg="blue"))
+        singleParam.append(tk.Label(Upper_DCM_Frame, text=nameAndValues[0]))
+        input_list.append(singleParam)
+    DCM_Frame.grid(row=0, column=0, pady=25, padx=25, sticky="nsew")
+    Upper_DCM_Frame.grid(row=0,column=0)
+    Title_Label = tk.Label(Upper_DCM_Frame, text="Please choose a parameter")
+    Title_Label.grid(row=0,column=0, columnspan=5, padx=10, pady=10, sticky="w")
+    rowNum = 0
+    for rowItem in range(2):
+        rowNum = rowNum + 1
+        for col in range(5):
+            for LabelOrInput in range(2):
+                input_list[col][LabelOrInput].grid(row = str(rowNum+LabelOrInput), column=col, padx=10, pady=10)
+
 
 
 
@@ -163,7 +187,7 @@ def on_Login():
     AAIR_Button.grid(row=0, column=2)
     VOOR_Button.grid(row=1, column=3)
     VVIR_Button.grid(row=0, column=3)
-
+    """
     LRL_input.grid(row=1, column=0, columnspan=1, padx=10, pady=10)
     LRL_Label.grid(row=2, column=0, columnspan=1, padx=10, pady=10)
     URL_input.grid(row=1, column=1, columnspan=1, padx=10, pady=10)
@@ -184,7 +208,12 @@ def on_Login():
     H_input.grid(row=3, column=3, columnspan=1, padx=10, pady=0)
     RS_input.grid(row=3, column=4, columnspan=1, padx=10, pady=0)
     RS_Label.grid(row=4, column=4, columnspan=1, padx=10, pady=0)
+    """
+
+    createAllDCMItems()
+
     
+
     Change_Parameters("AOO")
     # VA_input.grid(row=0, column=3, columnspan=1, padx=10, pady=10)
     # VA_Label.grid(row=1, column=3, columnspan=1, padx=10, pady=10)
@@ -243,6 +272,20 @@ Login_button = tk.Button(Welcome_Frame, text="LOGIN", padx=10, pady=5, command=o
 CreateUser_button = tk.Button(Welcome_Frame, text="Create New User", padx=10, pady=5, command= on_registerUser)
 
 
+
+
+
+
+    
+        
+
+
+
+
+        
+    
+
+
 LRL_input = tk.Entry(Upper_DCM_Frame, width=10, bg="white", fg="blue")
 LRL_Label = tk.Label(Upper_DCM_Frame, text="Lower\nRate Limit")
 
@@ -285,7 +328,7 @@ RS_Label = tk.Label(Upper_DCM_Frame, text="Rate\nSmoothing")
 MSR_input = tk.Entry(Upper_DCM_Frame, width=10, bg="white", fg="blue")
 MSR_Label = tk.Label(Upper_DCM_Frame, text="Maximum\nSensor Rate")
 
-Save_Button = tk.Button(Lower_DCM_Frame, text="Save", width=10, height=4 )#command=Save_Parameters)
+Save_Button = tk.Button(Lower_DCM_Frame, text="Save", width=10, height=4, command=Save_Parameters)
 logout_button = tk.Button(Upper_DCM_Frame, text="Logout", command=Logout)
 
 AOO_Button = tk.Button(Lower_DCM_Frame, text="AOO", padx=10, pady=5, width=8, height=1, command= lambda: Change_Parameters("AOO"))

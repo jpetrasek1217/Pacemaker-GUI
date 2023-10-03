@@ -127,10 +127,10 @@ def getAllSavedParameterValues(pacingMode: str | PacingModes) -> list[tuple[str,
     if isinstance(pacingMode, PacingModes):
         pacingMode = pacingMode.getName()
 
-    listOfParamObjs = PacingModes[pacingMode]
+    listOfParamObjs = PacingModes[pacingMode].getParameters()
     listOfParams = []
     for paramObj in listOfParamObjs:
-        listOfParams.append(tuple(paramObj.getTitle(), _activeUser.getParameterValue(paramObj.getName())))
+        listOfParams.append((paramObj.getTitle(), _activeUser.getParameterValue(paramObj.getName())))
     return listOfParams
 
 
