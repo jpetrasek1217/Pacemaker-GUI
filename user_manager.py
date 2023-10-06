@@ -8,13 +8,21 @@ from user import User
 _MAX_USERS_SAVED = int(10)
 _REGEX_VALID_CHARS = "^[a-zA-Z0-9]*$"
 
+
+# --- Init ---
+
 _users: list[User] = local_storage.readUsersFromFile()
 _activeUser: User | None = None
+for user in _users:
+    user.addMissingParameters(Parameters.getNominalValues())
 
 
 # --- Login, Register, Delete Users ---
 
 def loginUser(username: str, password: str) -> tuple[bool, str]:
+    '''Attempts to login the User with the given Username and Password strings.
+    Returns a tuple of (isSuccessful, ErrorMessage).
+    '''
     usernameFormatted = username.strip()
     passwordFormatted = password.strip()
 
@@ -33,6 +41,9 @@ def loginUser(username: str, password: str) -> tuple[bool, str]:
 
 
 def registerUser(username: str, password: str) -> tuple[bool, str]:
+    '''Attempts to register a new User with the given Username and Password strings.
+    Returns a tuple of (isSuccessful, ErrorMessage).
+    '''
     if len(_users) >= _MAX_USERS_SAVED:                 # Check that the amount of saved users is not maxed
         return False, "Maximum amount of users created."
     
@@ -54,12 +65,18 @@ def registerUser(username: str, password: str) -> tuple[bool, str]:
 
 
 def logoutUser() -> tuple[bool, str]:
+    '''Attempts to logout the active User.
+    Returns a tuple of (isSuccessful, ErrorMessage).
+    '''
     global _activeUser
     _activeUser = None
     return True, ""
 
 
 def deleteUser(username: str) -> tuple[bool, str]:
+    '''Attempts to delete the User with the given Username string.
+    Returns a tuple of (isSuccessful, ErrorMessage).
+    '''
     user = _findUser(username)                          # Checks that user exists
     userExists = isinstance(user, User)
     if not userExists:                                  
@@ -70,6 +87,9 @@ def deleteUser(username: str) -> tuple[bool, str]:
 
 
 def _findUser(username: str) -> User | None:         # Finds user with matching username, returns user
+    '''Returns a User with the matching given Username string,
+    returns None if a User is not found.
+    '''
     for user in _users:
         if not isinstance(user, User):
             raise TypeError
@@ -79,6 +99,9 @@ def _findUser(username: str) -> User | None:         # Finds user with matching 
 
 
 def _validateUsernamePasswordInputs(username: str, password: str) -> tuple[bool, str]:
+    '''Validates that the given Username and Password strings only contain the desired characters.
+    Returns a tuple of (isSuccessful, ErrorMessage).
+    '''
     if(len(username) <= 0):
         return False, "Invalid username. Please fill in all required fields."
     elif(not re.search(_REGEX_VALID_CHARS, username)):
@@ -94,14 +117,17 @@ def _validateUsernamePasswordInputs(username: str, password: str) -> tuple[bool,
 # --- Set & Get Parameters from Active User ---
 
 def getActiveUserUsername() -> str:
+    '''Returns the Active User's Username.'''
     return _activeUser.getUsername()
 
 
 def getPacingMode() -> str:
+    '''Returns the Active User's Pacing Mode'''
     return _activeUser.getPacingMode()
 
 
 def savePacingMode(pacingMode: str | PacingModes) -> tuple[bool, str]:
+    '''Updates and saves the passed Pacing Mode to the Active User.'''
     if isinstance(pacingMode, PacingModes):
         pacingMode = pacingMode.getName()
 
@@ -111,18 +137,21 @@ def savePacingMode(pacingMode: str | PacingModes) -> tuple[bool, str]:
 
 
 def getSavedParameterValue(param: str | Parameters) -> float:
+    '''Returns the value of the specificed Parameter from the Active User.'''
     if isinstance(param, Parameters):
         param = param.getName()
     return _activeUser.getParameterValue(param)
 
 
 def getAllSavedParametersAndVisibilityFromSavedPacingMode() -> list[tuple[str, str, float, bool]]:
+    '''Get all saved Parameters from the Active User.
+    Returns a list of tuples of (parameterName, parameterTitle, parameterValue, isParamaterVisibleAndEditable).'''
     # Returns list of (Param Name, Param Title, Saved Param Value, is Param Visible)
-    listOfParamObjs = PacingModes.getAllVisibleParameters(_activeUser.getPacingMode())
+    listOfParamObjs = PacingModes.getAllVisibleParameters(_activeUser.getPacingMode())  # Returns all Atrial or Ventricular parameters
     listOfParams = []
     for paramObj in listOfParamObjs:
         listOfParams.append((paramObj.getName(),
-                             paramObj.getTitle(), 
+                             paramObj.getTitle() + '\n[' + paramObj.getUnits() + ']', 
                             _activeUser.getParameterValue(paramObj.getName()),
                             _isParameterVisible(paramObj.getName()),
                             ))
@@ -130,16 +159,18 @@ def getAllSavedParametersAndVisibilityFromSavedPacingMode() -> list[tuple[str, s
 
     
 def _isParameterVisible(param: str) -> bool:
+    '''Returns if the passed Parameter is in the subset of the Active User's Pacing Mode Parameters.'''
     if isinstance(param, Parameters):
         param = param.getName()
-    listOfParamObjs = PacingModes[_activeUser.getPacingMode()].getParameters()
+    listOfParamObjs = PacingModes[_activeUser.getPacingMode()].getParameters()  # Ger subset of parameters
     for paramObj in listOfParamObjs:
-        if param == paramObj.getName():
+        if param == paramObj.getName():     # If given parameter is in the subset (Parameter should be visible & editable)
             return True
     return False
 
 
 def saveParameterValue(param: str | Parameters, value: float) -> tuple[bool, str]:
+    '''Updates the specified Parameter from the Active User with the passed value.'''
     if isinstance(param, Parameters):
         param = param.getName()
 
@@ -153,14 +184,15 @@ def saveParameterValue(param: str | Parameters, value: float) -> tuple[bool, str
 
 
 def _validateParameterValue(param: str, value: float) -> tuple[bool, str]:
+    '''Validates that the passed Parameter value is within the Parameter's acceptable range.'''
     paramObj = Parameters[param]
-    if not isinstance(value, float):
+    if not isinstance(value, float):    # Verify if value is a float
         try:
-            float(value)
-            return True, ""
+            value = float(value)        # Checks if passed value was an integer or numeric string
         except ValueError:
-                return False, f"Please enter a floating point number for Parameter \'{paramObj.getTitle()}\'."
-    elif not paramObj.isAcceptableValue(value):
-        return False, f"Invalid value of \'{value}\' for Parameter \'{paramObj.getTitle()}\'.\n{paramObj.getAcceptableValuesString()}"
+                return False, f"Please enter a floating point number for Parameter \'{paramObj.getTitleNoNewline()}\'."
+    
+    if not paramObj.isAcceptableValue(value):     # Checks that the parameter is an acceptable value
+        return False, f"Invalid value of \'{value}\' for Parameter \'{paramObj.getTitleNoNewline()}\'.\n{paramObj.getAcceptableValuesString()}"
     else:
         return True, ""

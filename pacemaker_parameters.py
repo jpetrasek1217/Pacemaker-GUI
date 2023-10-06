@@ -20,6 +20,7 @@ class Parameters(Enum):
     def __init__(self, title: str, units: str, nominalValue: float, lowerLimit: float, upperLimit: float, *args: float) -> None:
         super().__init__()
         self._title = title
+        self._title_no_newline = self._title.replace('\n', ' ')
         self._units = units
         self._nominalValue = nominalValue
         self._lowerLimit = lowerLimit
@@ -29,15 +30,18 @@ class Parameters(Enum):
 
     def _checkValues(self) -> None:
         if self._lowerLimit > self._upperLimit:
-            raise ValueError(f"Parameter \'{self._title}\' has a Lower Limit higher than the Upper Limit.")
+            raise ValueError(f"Parameter \'{self._title_no_newline}\' has a Lower Limit higher than the Upper Limit.")
         if not self.isAcceptableValue(self._nominalValue):
-            raise ValueError(f"Parameter \'{self._title}\' has a Nominal Value that is not an Accepted Value.")
+            raise ValueError(f"Parameter \'{self._title_no_newline}\' has a Nominal Value that is not an Accepted Value.")
 
     def getName(self) -> str:
         return self.name
 
     def getTitle(self) -> str:
         return self._title
+    
+    def getTitleNoNewline(self) -> str:
+        return self._title_no_newline
     
     def getUnits(self) -> str:
         return self._units
@@ -52,7 +56,7 @@ class Parameters(Enum):
         return self._upperLimit
     
     def getAcceptableValuesString(self) -> str:
-        s = f"{self._title} Acceptable Values: {self._lowerLimit}-{self._upperLimit} {self._units}"
+        s = f"{self._title_no_newline} Acceptable Values: {self._lowerLimit}-{self._upperLimit} {self._units}"
         if self._additionalAcceptableValues:
             s += " or a value of "
             for acceptableVal in self._additionalAcceptableValues:
