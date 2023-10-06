@@ -163,7 +163,7 @@ def createAllDCMItems(mode):
         paramValue = parameter[2]
         paramVisibility = parameter[3]
 
-        entry = tk.Entry(Upper_DCM_Frame, width=10, bg="white", fg="blue")
+        entry = tk.Entry(Upper_DCM_Frame, width=10, bg="white", fg="black")
         entry.insert(0, paramValue)
         if not paramVisibility:
             entry.config(state="disabled")
@@ -174,17 +174,19 @@ def createAllDCMItems(mode):
     
     DCM_Frame.grid(row=0, column=0, pady=25, padx=25, sticky="nsew")
     Upper_DCM_Frame.grid(row=0,column=0)
-    Title_Label = tk.Label(Upper_DCM_Frame, text="Mode: " + mode)
+    Title_Label = tk.Label(Upper_DCM_Frame, text="Mode: " + mode, font=("Montserrat", 14, "bold"))
     Title_Label.grid(row=0,column=0, columnspan=5, padx=10, pady=10, sticky="w")
     logout_button.grid(row=0,column=4, columnspan=1, padx=10, pady=10)
+    Ver_Num_Label.grid(row=0, column=2)
+    
 
     for row in range(2):
         for col in range(5):
             index = row * 5 + col
             if index >= len(parameterEntryAndLabelList):
-                break;
-            parameterEntryAndLabelList[index][1].grid(row = 2*row + 1, column=col, padx=10, pady=10)
-            parameterEntryAndLabelList[index][2].grid(row = 2*row + 2, column=col, padx=10, pady=10)
+                break
+            parameterEntryAndLabelList[index][1].grid(row = 2*row + 1, column=col, padx=10, pady=(15,5))
+            parameterEntryAndLabelList[index][2].grid(row = 2*row + 2, column=col, padx=10, pady=(5,15))
         else:
             continue    # only executed if the inner loop did NOT break
         break           # only executed if the inner loop DID break
@@ -204,6 +206,7 @@ def on_Login():
     Lower_DCM_Frame.grid(row=1,column=0)
 
     Save_Button.grid(row=0, column=4, rowspan=2)
+    Ver_Num_Label.grid(row=0, column=2)
     logout_button.grid(row=0,column=4, columnspan=1, padx=10, pady=10)
 
     AOO_Button.grid(row=1, column=0)
@@ -214,6 +217,8 @@ def on_Login():
     AAIR_Button.grid(row=0, column=2)
     VOOR_Button.grid(row=1, column=3)
     VVIR_Button.grid(row=0, column=3)
+    Institution_Label.grid(row=2, column=1, columnspan=3, pady=(10,0))
+    
     """
     LRL_input.grid(row=1, column=0, columnspan=1, padx=10, pady=10)
     LRL_Label.grid(row=2, column=0, columnspan=1, padx=10, pady=10)
@@ -264,17 +269,17 @@ def on_Login():
 
 def Start():
     Welcome_Frame.grid(row=0, column=0, pady=25, padx=25)
-    Welcome_Label.grid(pady=10, row=0,column=0, columnspan=2)
+    Welcome_Label.grid(pady=(10,0), row=0,column=0, columnspan=2)
     #Welcome_Label.pack(pady=10)
-    Prompt_Label.grid(row=1, column=0, columnspan=2, pady=10)
+    Prompt_Label.grid(row=1, column=0, columnspan=2, pady=(0,10))
     #Prompt_Label.pack(pady=10)
-    Username_Label.grid(pady=10,row=2, column=0, columnspan=2)
+    Username_Label.grid(pady=(10,5),row=2, column=0, columnspan=2)
     #Username_Label.pack(pady=10)
-    Username_input.grid(row=3, column=0, padx=10, pady=0, columnspan=2)
+    Username_input.grid(row=3, column=0, padx=(5,10), pady=0, columnspan=2)
     #Username_input.pack(pady=10)
-    Password_Label.grid(pady=10,row=4, column=0, columnspan=2)
+    Password_Label.grid(pady=(10,5),row=4, column=0, columnspan=2)
     #Password_Label.pack(pady=10)
-    Password_input.grid(row=5, column=0, padx=10, pady=(0,10), columnspan=2)
+    Password_input.grid(row=5, column=0, padx=10, pady=(5,30), columnspan=2)
     #Password_input.pack(pady=10)
     Login_button.grid(row=6, column=0, padx=10, pady=0)
     #Login_button.pack(pady=10)
@@ -289,14 +294,14 @@ def on_registerUser():
     else:
          GUI_helpers.throwErrorPopup(errorMsg)
 
-Welcome_Label = tk.Label(Welcome_Frame, text="Welcome!")
+Welcome_Label = tk.Label(Welcome_Frame, text="Welcome!",  font=("Montserrat", 16, "bold"))
 Prompt_Label = tk.Label(Welcome_Frame, text="Please login or create a new user")
 Username_Label = tk.Label(Welcome_Frame, text="Username")
-Username_input = tk.Entry(Welcome_Frame, width=20, bg="white", fg="blue")
+Username_input = tk.Entry(Welcome_Frame, width=20, bg="white", fg="black")
 Password_Label = tk.Label(Welcome_Frame, text="Password")
-Password_input = tk.Entry(Welcome_Frame, width=20, bg="white", fg="blue", show="*")
-Login_button = tk.Button(Welcome_Frame, text="LOGIN", padx=10, pady=5, command=on_Login)
-CreateUser_button = tk.Button(Welcome_Frame, text="Create New User", padx=10, pady=5, command= on_registerUser)
+Password_input = tk.Entry(Welcome_Frame, width=20, bg="white", fg="black", show="*")
+Login_button = tk.Button(Welcome_Frame, text="LOGIN", padx=10, pady=5, bg="white", command=on_Login)
+CreateUser_button = tk.Button(Welcome_Frame, text="Create New User", padx=10, pady=5, bg="white", command= on_registerUser)
 
 
 
@@ -357,18 +362,20 @@ MSR_Label = tk.Label(Upper_DCM_Frame, text="Maximum\nSensor Rate")
 
 '''
 
-Save_Button = tk.Button(Lower_DCM_Frame, text="Save", width=10, height=4, command=onSaveParameters)
-logout_button = tk.Button(Upper_DCM_Frame, text="Logout", command=Logout)
+Save_Button = tk.Button(Lower_DCM_Frame, text="Save", width=10, height=4, bg="white", command=onSaveParameters)
+Ver_Num_Label = tk.Label(Upper_DCM_Frame, text="Ver 1.0.0")
+logout_button = tk.Button(Upper_DCM_Frame, text="Logout", bg="white", command=Logout)
 
-AOO_Button = tk.Button(Lower_DCM_Frame, text="AOO", padx=10, pady=5, width=8, height=1, command= lambda: Change_Parameters("AOO"))
-AAI_Button = tk.Button(Lower_DCM_Frame, text="AAI", padx=10, pady=5, width=8, height=1, command= lambda: Change_Parameters("AAI"))
-VOO_Button = tk.Button(Lower_DCM_Frame, text="VOO", padx=10, pady=5, width=8, height=1, command= lambda: Change_Parameters("VOO"))
-VVI_Button = tk.Button(Lower_DCM_Frame, text="VVI", padx=10, pady=5, width=8, height=1, command= lambda: Change_Parameters("VVI"))
+AOO_Button = tk.Button(Lower_DCM_Frame, text="AOO", padx=10, pady=5, width=8, height=1, bg="white", command= lambda: Change_Parameters("AOO"))
+AAI_Button = tk.Button(Lower_DCM_Frame, text="AAI", padx=10, pady=5, width=8, height=1, bg="white", command= lambda: Change_Parameters("AAI"))
+VOO_Button = tk.Button(Lower_DCM_Frame, text="VOO", padx=10, pady=5, width=8, height=1, bg="white", command= lambda: Change_Parameters("VOO"))
+VVI_Button = tk.Button(Lower_DCM_Frame, text="VVI", padx=10, pady=5, width=8, height=1, bg="white", command= lambda: Change_Parameters("VVI"))
 
-AOOR_Button = tk.Button(Lower_DCM_Frame, text="AOOR", padx=10, pady=5, width=8, height=1, command= lambda: Change_Parameters("AOOR"))
-AAIR_Button = tk.Button(Lower_DCM_Frame, text="AAIR", padx=10, pady=5, width=8, height=1, command= lambda: Change_Parameters("AAIR"))
-VOOR_Button = tk.Button(Lower_DCM_Frame, text="VOOR", padx=10, pady=5, width=8, height=1, command= lambda: Change_Parameters("VOOR"))
-VVIR_Button = tk.Button(Lower_DCM_Frame, text="VVIR", padx=10, pady=5, width=8, height=1, command= lambda: Change_Parameters("VVIR"))
+AOOR_Button = tk.Button(Lower_DCM_Frame, text="AOOR", padx=10, pady=5, width=8, height=1, bg="white", command= lambda: Change_Parameters("AOOR"))
+AAIR_Button = tk.Button(Lower_DCM_Frame, text="AAIR", padx=10, pady=5, width=8, height=1, bg="white", command= lambda: Change_Parameters("AAIR"))
+VOOR_Button = tk.Button(Lower_DCM_Frame, text="VOOR", padx=10, pady=5, width=8, height=1, bg="white", command= lambda: Change_Parameters("VOOR"))
+VVIR_Button = tk.Button(Lower_DCM_Frame, text="VVIR", padx=10, pady=5, width=8, height=1, bg="white", command= lambda: Change_Parameters("VVIR"))
+Institution_Label = tk.Label(Lower_DCM_Frame, text="McMaster University")
 
 '''
 input_list = [LRL_input,
