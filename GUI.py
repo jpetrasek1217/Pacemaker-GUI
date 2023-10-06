@@ -2,7 +2,7 @@ import tkinter as tk
 import user_manager 
 import GUI_helpers
 
-
+_VERSION_NUMBER = "1.0.1"
 root = tk.Tk()
 root.title= "Title"
 root.iconbitmap=("#")
@@ -363,7 +363,7 @@ MSR_Label = tk.Label(Upper_DCM_Frame, text="Maximum\nSensor Rate")
 '''
 
 Save_Button = tk.Button(Lower_DCM_Frame, text="Save", width=10, height=4, bg="white", command=onSaveParameters)
-Ver_Num_Label = tk.Label(Upper_DCM_Frame, text="Ver 1.0.0")
+Ver_Num_Label = tk.Label(Upper_DCM_Frame, text="Version " + _VERSION_NUMBER)
 logout_button = tk.Button(Upper_DCM_Frame, text="Logout", bg="white", command=Logout)
 
 AOO_Button = tk.Button(Lower_DCM_Frame, text="AOO", padx=10, pady=5, width=8, height=1, bg="white", command= lambda: Change_Parameters("AOO"))
