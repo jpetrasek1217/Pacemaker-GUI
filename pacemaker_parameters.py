@@ -2,19 +2,19 @@ from enum import Enum
 
 class Parameters(Enum):
     # PARAMETER_NAME = "title", "units", nominalValue, lowerLimit, upperLimit, *additionalAcceptableValues
-    LOWER_RATE_LIMIT = "Lower Rate Limit", "ppm", 60.0, 30.0, 175.0
-    UPPER_RATE_LIMIT = "Upper Rate Limit", "ppm", 120.0, 50.0, 175.0
-    ATRIAL_AMPLITUDE = "Atrial Amplitude", "V", 3.5, 0.5, 7.0, 0.0
-    ATRIAL_PULSE_WIDTH = "Atrial Pulse Width", "ms", 0.4, 0.1, 1.9, 0.05
-    ATRIAL_REFACTORY_PERIOD = "Atrial Refractory Period", "ms", 250.0, 150.0, 500.0
-    ATRIAL_SENSITIVITY = "Atrial Sensitivity", "mV", 0.75, 1.0, 10.0, 0.25, 0.5, 0.75
-    VENTRICULAR_AMPLITUDE = "Ventricular Amplitude", "V", 3.5, 0.5, 7.0, 0.0
-    VENTRICULAR_PULSE_WIDTH = "Ventricular Pulse Width", "ms", 0.4, 0.1, 1.9, 0.05
-    VENTRICULAR_REFACTORY_PERIOD = "Ventricular Refractory Period", "ms", 320.0, 150.0, 500.0
-    VENTRICULAR_SENSITIVITY = "Ventricular Sensitivity", "mV", 2.5, 1.0, 10.0, 0.25, 0.5, 0.75
+    LOWER_RATE_LIMIT = "Lower Rate\nLimit", "ppm", 60.0, 30.0, 175.0
+    UPPER_RATE_LIMIT = "Upper Rate\nLimit", "ppm", 120.0, 50.0, 175.0
+    ATRIAL_AMPLITUDE = "Atrial\nAmplitude", "V", 3.5, 0.5, 7.0, 0.0
+    ATRIAL_PULSE_WIDTH = "Atrial\nPulse Width", "ms", 0.4, 0.1, 1.9, 0.05
+    ATRIAL_REFACTORY_PERIOD = "Atrial\nRefractory Period", "ms", 250.0, 150.0, 500.0
+    ATRIAL_SENSITIVITY = "Atrial\nSensitivity", "mV", 0.75, 1.0, 10.0, 0.25, 0.5, 0.75
+    VENTRICULAR_AMPLITUDE = "Ventricular\nAmplitude", "V", 3.5, 0.5, 7.0, 0.0
+    VENTRICULAR_PULSE_WIDTH = "Ventricular\nPulse Width", "ms", 0.4, 0.1, 1.9, 0.05
+    VENTRICULAR_REFACTORY_PERIOD = "Ventricular\nRefractory Period", "ms", 320.0, 150.0, 500.0
+    VENTRICULAR_SENSITIVITY = "Ventricular\nSensitivity", "mV", 2.5, 1.0, 10.0, 0.25, 0.5, 0.75
     HYSTERESIS = "Hysteresis", "ms", 0.0, 30.0, 175.0, 0.0
-    RATE_SMOOTHING = "Rate Smoothing", "%", 0.0, 3.0, 25.0, 0.0
-    MAX_SENSOR_RATE = "Max Sensor Rate", "ppm", 120.0, 50.0, 175.0
+    RATE_SMOOTHING = "Rate\nSmoothing", "%", 0.0, 3.0, 25.0, 0.0
+    MAX_SENSOR_RATE = "Max Sensor\nRate", "ppm", 120.0, 50.0, 175.0
     PVARP = "PVARP", "ms", 250.0, 150.0, 500.0
 
     def __init__(self, title: str, units: str, nominalValue: float, lowerLimit: float, upperLimit: float, *args: float) -> None:

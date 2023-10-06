@@ -71,7 +71,7 @@ def Change_Parameters(mode):
     for widget in Upper_DCM_Frame.winfo_children():
         widget.grid_forget()
     DCM_Frame.grid_forget()
-    createAllDCMItems()
+    createAllDCMItems(mode)
 
     '''
     SetInputState(input_list, "normal")
@@ -154,7 +154,7 @@ def onSaveParameters():
             return
 
 
-def createAllDCMItems():
+def createAllDCMItems(mode):
     global parameterEntryAndLabelList
     parameterEntryAndLabelList = []
     for parameter in user_manager.getAllSavedParametersAndVisibilityFromSavedPacingMode():
@@ -174,8 +174,9 @@ def createAllDCMItems():
     
     DCM_Frame.grid(row=0, column=0, pady=25, padx=25, sticky="nsew")
     Upper_DCM_Frame.grid(row=0,column=0)
-    Title_Label = tk.Label(Upper_DCM_Frame, text="Please choose a parameter")
+    Title_Label = tk.Label(Upper_DCM_Frame, text="Mode: " + mode)
     Title_Label.grid(row=0,column=0, columnspan=5, padx=10, pady=10, sticky="w")
+    logout_button.grid(row=0,column=4, columnspan=1, padx=10, pady=10)
 
     for row in range(2):
         for col in range(5):
@@ -236,7 +237,7 @@ def on_Login():
     RS_Label.grid(row=4, column=4, columnspan=1, padx=10, pady=0)
     """
 
-    createAllDCMItems()
+    createAllDCMItems("AOO")
 
     
 
