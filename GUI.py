@@ -2,7 +2,7 @@ import tkinter as tk
 import user_manager 
 import GUI_helpers
 
-_VERSION_NUMBER = "1.0.1"
+_VERSION_NUMBER = "1.0.2"
 root = tk.Tk()
 root.title= "Title"
 root.iconbitmap=("#")
@@ -49,6 +49,7 @@ def Amnesia(param_list):
 
 
 def Logout():
+    user_manager.logoutUser()
     for widget in DCM_Frame.winfo_children():
         widget.grid_forget()
     DCM_Frame.grid_forget()
@@ -242,7 +243,7 @@ def on_Login():
     RS_Label.grid(row=4, column=4, columnspan=1, padx=10, pady=0)
     """
 
-    createAllDCMItems("AOO")
+    createAllDCMItems(user_manager.getPacingMode())
 
     
 
@@ -300,7 +301,7 @@ Username_Label = tk.Label(Welcome_Frame, text="Username")
 Username_input = tk.Entry(Welcome_Frame, width=20, bg="white", fg="black")
 Password_Label = tk.Label(Welcome_Frame, text="Password")
 Password_input = tk.Entry(Welcome_Frame, width=20, bg="white", fg="black", show="*")
-Login_button = tk.Button(Welcome_Frame, text="LOGIN", padx=10, pady=5, bg="white", command=on_Login)
+Login_button = tk.Button(Welcome_Frame, text="Login", padx=10, pady=5, bg="white", command=on_Login)
 CreateUser_button = tk.Button(Welcome_Frame, text="Create New User", padx=10, pady=5, bg="white", command= on_registerUser)
 
 
