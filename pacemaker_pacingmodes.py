@@ -122,7 +122,7 @@ class PacingModes(Enum):
             raise TypeError(f"Pacing Mode \'{self.name}\' has objects that are not a Parameter.")
         
     def getName(self) -> str:
-        '''Retruns the Pacing Mode's name.'''
+        '''Retruns the Pacing Mode's name.  Used as the key for dictionaries containing Pacing Modes.'''
         return self.name
 
     def getParameters(self) -> list[Parameters]:

@@ -190,9 +190,9 @@ def _validateParameterValue(param: str, value: float) -> tuple[bool, str]:
         try:
             value = float(value)        # Checks if passed value was an integer or numeric string
         except ValueError:
-                return False, f"Please enter a floating point number for Parameter \'{paramObj.getTitleNoNewline()}\'."
+                return False, f"Please enter a floating point number for Parameter \'{paramObj.getTitleNoFormatting()}\'."
     
     if not paramObj.isAcceptableValue(value):     # Checks that the parameter is an acceptable value
-        return False, f"Invalid value of \'{value}\' for Parameter \'{paramObj.getTitleNoNewline()}\'.\n{paramObj.getAcceptableValuesString()}"
+        return False, f"Invalid value of \'{value}\' for Parameter \'{paramObj.getTitleNoFormatting()}\'.\n{paramObj.getAcceptableValuesString()}"
     else:
         return True, ""

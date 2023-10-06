@@ -19,44 +19,58 @@ class Parameters(Enum):
 
     def __init__(self, title: str, units: str, nominalValue: float, lowerLimit: float, upperLimit: float, *args: float) -> None:
         super().__init__()
-        self._title = title
-        self._title_no_newline = self._title.replace('\n', ' ')
-        self._units = units
-        self._nominalValue = nominalValue
-        self._lowerLimit = lowerLimit
-        self._upperLimit = upperLimit
-        self._additionalAcceptableValues = args
+        self._title = str(title)
+        self._title_no_formatting = self._title.replace('\n', ' ') # Used for error messages
+        self._units = str(units)
+        self._nominalValue = float(nominalValue)
+        self._lowerLimit = float(lowerLimit)
+        self._upperLimit = float(upperLimit)
+        self._additionalAcceptableValues = list(args)
         self._checkValues()
 
     def _checkValues(self) -> None:
+        '''Verifies the Parameter's initialized values.'''
         if self._lowerLimit > self._upperLimit:
-            raise ValueError(f"Parameter \'{self._title_no_newline}\' has a Lower Limit higher than the Upper Limit.")
+            raise ValueError(f"Parameter \'{self._title_no_formatting}\' has a Lower Limit higher than the Upper Limit.")
         if not self.isAcceptableValue(self._nominalValue):
-            raise ValueError(f"Parameter \'{self._title_no_newline}\' has a Nominal Value that is not an Accepted Value.")
+            raise ValueError(f"Parameter \'{self._title_no_formatting}\' has a Nominal Value that is not an Accepted Value.")
+        try:
+            for i in range(len(self._additionalAcceptableValues)):
+                self._additionalAcceptableValues[i] = float(self._additionalAcceptableValues[i])
+        except ValueError:
+            raise ValueError(f"Parameter \'{self._title_no_formatting}\' has Additional Acceptable Values that are not numbers.")
 
     def getName(self) -> str:
+        '''Returns the Parameter's Name. Used as the key for dictionaries containing Parameters.'''
         return self.name
 
     def getTitle(self) -> str:
+        '''Returns the Parameter Title. Note that this includes formatting characters for display on the GUI.'''
         return self._title
     
-    def getTitleNoNewline(self) -> str:
-        return self._title_no_newline
+    def getTitleNoFormatting(self) -> str:
+        '''Returns the Parameter's Title without any formatting.'''
+        return self._title_no_formatting
     
     def getUnits(self) -> str:
+        '''Returns the Parameter's Units.'''
         return self._units
 
     def getNominalValue(self) -> float:
+        '''Returns the Parameter's Nominal Value.'''
         return self._nominalValue
     
     def getLowerLimit(self) -> float:
+        '''Return's the Parameter's Lower Limit.'''
         return self._lowerLimit
     
     def getUpperLimit(self) -> float:
+        '''Returns the Parameter;s Upper Limit.'''
         return self._upperLimit
     
     def getAcceptableValuesString(self) -> str:
-        s = f"{self._title_no_newline} Acceptable Values: {self._lowerLimit}-{self._upperLimit} {self._units}"
+        '''Returns a formatted string of all the acceptable values of the Parameter. Used for the GUI.'''
+        s = f"{self._title_no_formatting} Acceptable Values: {self._lowerLimit}-{self._upperLimit} {self._units}"
         if self._additionalAcceptableValues:
             s += " or a value of "
             for acceptableVal in self._additionalAcceptableValues:
@@ -66,6 +80,7 @@ class Parameters(Enum):
         return s
     
     def isAcceptableValue(self, value: float) -> bool:
+        '''Validates that the given value is an acceptable value for the Parameter.'''
         if value >= self._lowerLimit and value <= self._upperLimit:
             return True
         elif self._additionalAcceptableValues and any(value == acceptableVal for acceptableVal in self._additionalAcceptableValues):
@@ -75,5 +90,6 @@ class Parameters(Enum):
 
     @classmethod
     def getNominalValues(cls) -> dict[str: float]:
+        '''Returns a dictionary of {parameterName: parameterNominalValue}.'''
         return {param.getName(): param.getNominalValue() for param in Parameters}
             
