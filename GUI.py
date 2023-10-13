@@ -2,7 +2,7 @@ import tkinter as tk
 import user_manager 
 import GUI_helpers
 
-_VERSION_NUMBER = "1.0.2"
+_VERSION_NUMBER = "1.0.3"
 root = tk.Tk()
 root.title= "Title"
 root.iconbitmap=("#")
