@@ -8,7 +8,7 @@ _PACINGMODE_KEY = "PACING_MODE"
 _PARAMS_KEY = "PARAMETERS"
 
 def readUsersFromFile() -> list[User]:
-    '''Reads all the saved User data from file, returns a list of User Objects.'''
+    '''Reads all the saved User data from the User data file, returns a list of User Objects.'''
     users = []
     userDictList = _readFromJSONFile(_USERS_FILEPATH)
     for userDict in userDictList:
@@ -21,7 +21,7 @@ def readUsersFromFile() -> list[User]:
     return users
 
 
-def _readFromJSONFile(filepath: str) -> dict:
+def _readFromJSONFile(filepath: str) -> dict | list:
     '''Reads a dicitionary from the specified JSON file.'''
     with open(filepath, "r") as file:
         fileContents = json.load(file)
@@ -41,7 +41,7 @@ def writeUsersToFile(users: list[User]) -> None:
     _writeToJSONFile(_USERS_FILEPATH, userDictList)
 
 
-def _writeToJSONFile(filepath: str, fileContents: dict) -> None:
+def _writeToJSONFile(filepath: str, fileContents: dict | list) -> None:
     '''Writes a dicitionary to the specified JSON file.'''
     with open(filepath, "w") as file:
         json.dump(fileContents, file)

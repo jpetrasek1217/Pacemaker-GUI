@@ -17,17 +17,17 @@ class User:
 
    
     def getUsername(self) -> str:
-        '''Sets the User's Username.'''
+        '''Returns the User's username.'''
         return self._username
     
 
     def getPassword(self) -> str:
-        '''Sets the User's Password.'''
+        '''Returns the User's password.'''
         return self._password
     
 
     def getPacingMode(self) -> str:
-        '''Returns the User's Pacing Mode.'''
+        '''Returns the User's pacing mode.'''
         return self._pacingMode
     
 
@@ -37,7 +37,7 @@ class User:
 
 
     def getParameterValue(self, key: str) -> float:
-        '''Returns the value of the specified User Parameter.'''
+        '''Returns the value of the specified Pacemaker Parameter.'''
         keyExists = isinstance(self._params.get(key), float)    # Check if key exists in user's parameters
         if keyExists:
             return self._params[key]
@@ -46,12 +46,12 @@ class User:
     
 
     def getAllParameterValues(self) -> dict[str: float]:
-        '''Returns a dictionary of all the User's Parameters.'''
+        '''Returns a dictionary of all the User's Pacemaker Parameter values.'''
         return self._params
     
 
     def setParameterValue(self, key: str, value: float) -> None:
-        '''Update the specified User Parameter with the passed value.'''
+        '''Update the specified Pacemaker Parameter with the given value.'''
         keyExists = isinstance(self._params.get(key), float)    # Check if key exists in user's parameters
         valueIsFloat = isinstance(value, float)
         if keyExists and valueIsFloat:
@@ -63,7 +63,7 @@ class User:
 
 
     def setAllParameterValues(self, params: dict[str: float]) -> None:
-        '''Updates values of the User's Parameters with the values in the passed dictionary.'''
+        '''Updates values of the User's Pacemaker Parameters with the values in the given  dictionary.'''
         for key in self._params:            # Loop through user's parameter dictionary
             value = params.get(key)         # Get value from sent dict, if it does not exist get() returns None
             keyExistsInBoth = isinstance(value, float)  # Validates key exists in both and that the sent value is a float
@@ -72,7 +72,7 @@ class User:
 
 
     def addMissingParameters(self, params: dict[str: float]) -> None:
-        '''Adds all missing items in passed dictionary to the User's Parameters.'''
+        '''Adds all missing items in given dictionary to the User's Pacemaker Parameters.'''
         for key in params:
             if key not in self._params:
                 self._params[key] = params[key]

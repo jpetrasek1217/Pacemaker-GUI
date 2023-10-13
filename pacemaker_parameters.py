@@ -20,7 +20,7 @@ class Parameters(Enum):
     def __init__(self, title: str, units: str, nominalValue: float, lowerLimit: float, upperLimit: float, *args: float) -> None:
         super().__init__()
         self._title = str(title)
-        self._title_no_formatting = self._title.replace('\n', ' ') # Used for error messages
+        self._titleNoFormatting = self._title.replace('\n', ' ') # Used for error messages
         self._units = str(units)
         self._nominalValue = float(nominalValue)
         self._lowerLimit = float(lowerLimit)
@@ -31,14 +31,14 @@ class Parameters(Enum):
     def _checkValues(self) -> None:
         '''Verifies the Parameter's initialized values.'''
         if self._lowerLimit > self._upperLimit:
-            raise ValueError(f"Parameter \'{self._title_no_formatting}\' has a Lower Limit higher than the Upper Limit.")
-        if not self.isAcceptableValue(self._nominalValue):
-            raise ValueError(f"Parameter \'{self._title_no_formatting}\' has a Nominal Value that is not an Accepted Value.")
+            raise ValueError(f"Parameter \'{self._titleNoFormatting}\' has a Lower Limit higher than the Upper Limit.")
         try:
             for i in range(len(self._additionalAcceptableValues)):
                 self._additionalAcceptableValues[i] = float(self._additionalAcceptableValues[i])
         except ValueError:
-            raise ValueError(f"Parameter \'{self._title_no_formatting}\' has Additional Acceptable Values that are not numbers.")
+            raise ValueError(f"Parameter \'{self._titleNoFormatting}\' has Additional Acceptable Values that are not numbers.")
+        if not self.isAcceptableValue(self._nominalValue):
+            raise ValueError(f"Parameter \'{self._titleNoFormatting}\' has a Nominal Value that is not an Acceptable Value.")
 
     def getName(self) -> str:
         '''Returns the Parameter's Name. Used as the key for dictionaries containing Parameters.'''
@@ -49,11 +49,11 @@ class Parameters(Enum):
         return self._title
     
     def getTitleNoFormatting(self) -> str:
-        '''Returns the Parameter's Title without any formatting.'''
-        return self._title_no_formatting
+        '''Returns the Parameter's Title without any formatting, including removal of newline characters.'''
+        return self._titleNoFormatting
     
     def getUnits(self) -> str:
-        '''Returns the Parameter's Units.'''
+        '''Returns the Parameter's Units as a string.'''
         return self._units
 
     def getNominalValue(self) -> float:
@@ -61,16 +61,16 @@ class Parameters(Enum):
         return self._nominalValue
     
     def getLowerLimit(self) -> float:
-        '''Return's the Parameter's Lower Limit.'''
+        '''Returns the Parameter's Lower Limit.'''
         return self._lowerLimit
     
     def getUpperLimit(self) -> float:
-        '''Returns the Parameter;s Upper Limit.'''
+        '''Returns the Parameter's Upper Limit.'''
         return self._upperLimit
     
     def getAcceptableValuesString(self) -> str:
         '''Returns a formatted string of all the acceptable values of the Parameter. Used for the GUI.'''
-        s = f"{self._title_no_formatting} Acceptable Values: {self._lowerLimit}-{self._upperLimit} {self._units}"
+        s = f"{self._titleNoFormatting} Acceptable Values: {self._lowerLimit}-{self._upperLimit} {self._units}"
         if self._additionalAcceptableValues:
             s += " or a value of "
             for acceptableVal in self._additionalAcceptableValues:

@@ -21,7 +21,7 @@ for user in _users:
 
 def loginUser(username: str, password: str) -> tuple[bool, str]:
     '''Attempts to login the User with the given Username and Password strings.
-    Returns a tuple of (isSuccessful, ErrorMessage).
+    Returns a tuple of (isSuccessful: bool, ErrorMessage: str).
     '''
     usernameFormatted = username.strip()
     passwordFormatted = password.strip()
@@ -42,7 +42,7 @@ def loginUser(username: str, password: str) -> tuple[bool, str]:
 
 def registerUser(username: str, password: str) -> tuple[bool, str]:
     '''Attempts to register a new User with the given Username and Password strings.
-    Returns a tuple of (isSuccessful, ErrorMessage).
+    Returns a tuple of (isSuccessful: bool, ErrorMessage: str).
     '''
     if len(_users) >= _MAX_USERS_SAVED:                 # Check that the amount of saved users is not maxed
         return False, "Maximum amount of users created."
@@ -66,7 +66,7 @@ def registerUser(username: str, password: str) -> tuple[bool, str]:
 
 def logoutUser() -> tuple[bool, str]:
     '''Attempts to logout the active User.
-    Returns a tuple of (isSuccessful, ErrorMessage).
+    Returns a tuple of (isSuccessful: bool, ErrorMessage: str).
     '''
     global _activeUser
     _activeUser = None
@@ -75,7 +75,7 @@ def logoutUser() -> tuple[bool, str]:
 
 def deleteUser(username: str) -> tuple[bool, str]:
     '''Attempts to delete the User with the given Username string.
-    Returns a tuple of (isSuccessful, ErrorMessage).
+    Returns a tuple of (isSuccessful: bool, ErrorMessage: str).
     '''
     user = _findUser(username)                          # Checks that user exists
     userExists = isinstance(user, User)
@@ -84,6 +84,7 @@ def deleteUser(username: str) -> tuple[bool, str]:
     
     _users.remove(user)                                 # If user exists, remove from list and save updates locally
     local_storage.writeUsersToFile(_users)
+    return True, ""
 
 
 def _findUser(username: str) -> User | None:         # Finds user with matching username, returns user
@@ -100,7 +101,7 @@ def _findUser(username: str) -> User | None:         # Finds user with matching 
 
 def _validateUsernamePasswordInputs(username: str, password: str) -> tuple[bool, str]:
     '''Validates that the given Username and Password strings only contain the desired characters.
-    Returns a tuple of (isSuccessful, ErrorMessage).
+    Returns a tuple of (isSuccessful: bool, ErrorMessage: str).
     '''
     if(len(username) <= 0):
         return False, "Invalid username. Please fill in all required fields."
@@ -122,14 +123,14 @@ def getActiveUserUsername() -> str:
 
 
 def getPacingMode() -> str:
-    '''Returns the Active User's Pacing Mode'''
+    '''Returns the Active User's Pacing Mode.'''
     return _activeUser.getPacingMode()
 
 
 def savePacingMode(pacingMode: str | PacingModes) -> tuple[bool, str]:
-    '''Updates and saves the passed Pacing Mode to the Active User.'''
-    if isinstance(pacingMode, PacingModes):
-        pacingMode = pacingMode.getName()
+    '''Updates and saves the given Pacing Mode to the Active User.'''
+    if isinstance(pacingMode, PacingModes):     # Checks if given type is a PacingModes
+        pacingMode = pacingMode.getName()       # If so, get the str of the PacingMode
 
     _activeUser.setPacingMode(pacingMode)
     local_storage.writeUsersToFile(_users)
@@ -137,23 +138,24 @@ def savePacingMode(pacingMode: str | PacingModes) -> tuple[bool, str]:
 
 
 def getSavedParameterValue(param: str | Parameters) -> float:
-    '''Returns the value of the specificed Parameter from the Active User.'''
+    '''Returns the value of the specified Parameter from the Active User.'''
     if isinstance(param, Parameters):
         param = param.getName()
     return _activeUser.getParameterValue(param)
 
 
 def getAllSavedParametersAndVisibilityFromSavedPacingMode() -> list[tuple[str, str, float, bool]]:
-    '''Get all saved Parameters from the Active User.
-    Returns a list of tuples of (parameterName, parameterTitle, parameterValue, isParamaterVisibleAndEditable).'''
+    '''Get all saved Parameters from the Active User that correspond to either Atrial or Ventricular pacing modes.
+    Returns a list of tuples of (parameterName: str, parameterTitle: str, parameterValue: float, isParamaterVisibleAndEditable: bool).'''
     # Returns list of (Param Name, Param Title, Saved Param Value, is Param Visible)
     listOfParamObjs = PacingModes.getAllVisibleParameters(_activeUser.getPacingMode())  # Returns all Atrial or Ventricular parameters
     listOfParams = []
     for paramObj in listOfParamObjs:
-        listOfParams.append((paramObj.getName(),
-                             paramObj.getTitle() + '\n[' + paramObj.getUnits() + ']', 
-                            _activeUser.getParameterValue(paramObj.getName()),
-                            _isParameterVisible(paramObj.getName()),
+        paramObjName = paramObj.getName()
+        listOfParams.append((paramObjName,
+                             paramObj.getTitle() + '\n[' + paramObj.getUnits() + ']',   # Formatting for the GUI
+                            _activeUser.getParameterValue(paramObjName),
+                            _isParameterVisible(paramObjName),
                             ))
     return listOfParams
 
@@ -170,7 +172,7 @@ def _isParameterVisible(param: str) -> bool:
 
 
 def saveParameterValue(param: str | Parameters, value: float) -> tuple[bool, str]:
-    '''Updates the specified Parameter from the Active User with the passed value.'''
+    '''Updates the specified Parameter from the Active User with the given value.'''
     if isinstance(param, Parameters):
         param = param.getName()
 

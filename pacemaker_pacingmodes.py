@@ -112,8 +112,8 @@ class PacingModes(Enum):
 
     def __init__(self, pacingType: str, listOfParameters: list[Parameters]) -> None:
         super().__init__()
-        self._pacingType = pacingType # Atrial or Ventricular
-        self._params = listOfParameters
+        self._pacingType = str(pacingType) # Atrial or Ventricular
+        self._params = list(listOfParameters)
         self._checkValues()
 
     def _checkValues(self) -> None:
@@ -122,16 +122,16 @@ class PacingModes(Enum):
             raise TypeError(f"Pacing Mode \'{self.name}\' has objects that are not a Parameter.")
         
     def getName(self) -> str:
-        '''Retruns the Pacing Mode's name.  Used as the key for dictionaries containing Pacing Modes.'''
+        '''Returns the Pacing Mode's name.  Used as the key for dictionaries containing Pacing Modes.'''
         return self.name
 
     def getParameters(self) -> list[Parameters]:
-        "Returns a list of the Pacing Mode's Parameters."
+        '''Returns a list of the Pacing Mode's Parameters as Pacing Mode Parameter objects.'''
         return self._params
     
     @classmethod
     def getInitialPacingMode(cls) -> str:
-        '''Returns the default Pacing Mode.'''
+        '''Returns the default Pacing Mode's name.'''
         return PacingModes.AOO.name
     
     @classmethod

@@ -71,7 +71,7 @@ def Change_Parameters(mode):
     user_manager.savePacingMode(mode)
     for widget in Upper_DCM_Frame.winfo_children():
         widget.grid_forget()
-    DCM_Frame.grid_forget()
+    #DCM_Frame.grid_forget()
     createAllDCMItems(mode)
 
     '''
