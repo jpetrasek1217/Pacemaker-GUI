@@ -2,11 +2,11 @@ import tkinter as tk
 import user_manager 
 import GUI_helpers
 
-_VERSION_NUMBER = "1.0.3"
+_VERSION_NUMBER = "1.0.5"
 root = tk.Tk()
-root.title= "Title"
-root.iconbitmap=("#")
+root.title("Pacemaker Device Controller Monitor: Version 1")
 root.minsize(width=100, height=200)
+root.iconbitmap("pacemaker_icon.ico")
 
 Welcome_Frame = tk.Frame(root)
 
@@ -14,39 +14,7 @@ DCM_Frame = tk.Frame(root)
 Lower_DCM_Frame = tk.Frame(DCM_Frame)
 Upper_DCM_Frame = tk.Frame(DCM_Frame)
 
-
-# parameterEntryAndLabelList consists of sublists: [paramName, paramEntry, paramLabel]
 parameterEntryAndLabelList = []
-
-
-"""
-def placeRequiredParameters():
-    for num in range(5):
-        Mode_input = Entry(frame_stats, width=10, bg="white", fg="blue")
-        Mode_input.grid(row=3, column=0, columnspan=1, padx=10, pady=0)
-        Mode_Label = Label(frame_stats, text="ARP").grid(pady=(10,25),row=4, column=0)
-
-placeRequiredParameters()
-
-button_PARAMETERS = Button(frame_parameters, text="TEST", padx=10, pady=5)
-
-#button_MODE.grid(row=2, column=0)
-
-"""
-
-
-
-def SetInputState(param_list, set_state: str):
-    for widget in param_list:
-        widget.config(state=set_state)
-    return
-
-
-def Amnesia(param_list):
-    for widget in param_list:
-        widget.grid_forget()
-    return
-
 
 def Logout():
     user_manager.logoutUser()
@@ -65,83 +33,12 @@ def Logout():
     CreateUser_button.grid(row=6, column=1, padx=10, pady=10)
     return
     
-
-
 def Change_Parameters(mode):
     user_manager.savePacingMode(mode)
     for widget in Upper_DCM_Frame.winfo_children():
         widget.grid_forget()
     #DCM_Frame.grid_forget()
     createAllDCMItems(mode)
-
-    '''
-    SetInputState(input_list, "normal")
-    if mode == "AAIR" or mode == "AOOR" or mode == "VVIR" or mode == "VOOR":
-        SetInputState(input_list, "disabled")
-        return
-    
-    Title_Label = tk.Label(Upper_DCM_Frame, text="You are using Parameter " + mode + "  ")
-    Title_Label.grid(row=0,column=0, columnspan=5, padx=10, pady=10, sticky="w")
-
-    if mode=="AOO":
-        Amnesia(V_only)
-        AA_input.grid(row=1, column=2, columnspan=1, padx=10, pady=10)
-        AA_Label.grid(row=2, column=2, columnspan=1, padx=10, pady=10)
-        APW_input.grid(row=1, column=3, columnspan=1, padx=10, pady=10)
-        APW_Label.grid(row=2, column=3, columnspan=1, padx=10, pady=10)
-        AS_input.grid(row=3, column=0, columnspan=1, padx=10, pady=10)
-        AS_Label.grid(row=4, column=0, columnspan=1, padx=10, pady=10)
-        ARP_input.grid(row=3, column=1, columnspan=1, padx=10, pady=0)
-        ARP_Label.grid(row=4, column=1, columnspan=1, padx=10, pady=0)
-        RS_input.config(state="disabled")
-        AS_input.config(state="disabled")
-        MSR_input.config(state="disabled")
-        ARP_input.config(state="disabled")
-        PVARP_input.config(state="disabled")
-        H_input.config(state="disabled")
-        RS_input.config(state="disabled")
-    elif mode=="AAI":
-        Amnesia(V_only)
-        AA_input.grid(row=1, column=2, columnspan=1, padx=10, pady=10)
-        AA_Label.grid(row=2, column=2, columnspan=1, padx=10, pady=10)
-        APW_input.grid(row=1, column=3, columnspan=1, padx=10, pady=10)
-        APW_Label.grid(row=2, column=3, columnspan=1, padx=10, pady=10)
-        AS_input.grid(row=3, column=0, columnspan=1, padx=10, pady=10)
-        AS_Label.grid(row=4, column=0, columnspan=1, padx=10, pady=10)
-        ARP_input.grid(row=3, column=1, columnspan=1, padx=10, pady=0)
-        ARP_Label.grid(row=4, column=1, columnspan=1, padx=10, pady=0)
-        MSR_input.config(state="disabled")
-        VRP_input.config(state="disabled")
-    elif mode=="VOO":
-        Amnesia(A_only)
-        VA_input.grid(row=1, column=2, columnspan=1, padx=10, pady=10)
-        VA_Label.grid(row=2, column=2, columnspan=1, padx=10, pady=10)
-        VPW_input.grid(row=1, column=3, columnspan=1, padx=10, pady=10)
-        VPW_Label.grid(row=2, column=3, columnspan=1, padx=10, pady=10)
-        VS_input.grid(row=3, column=0, columnspan=1, padx=10, pady=10)
-        VS_Label.grid(row=4, column=0, columnspan=1, padx=10, pady=10)
-        VRP_input.grid(row=3, column=1, columnspan=1, padx=10, pady=0)
-        VRP_Label.grid(row=4, column=1, columnspan=1, padx=10, pady=0)
-        VS_input.config(state="disabled")
-        MSR_input.config(state="disabled")
-        VRP_input.config(state="disabled")
-        ARP_input.config(state="disabled")
-        PVARP_input.config(state="disabled")
-        H_input.config(state="disabled")
-        RS_input.config(state="disabled")
-    elif mode=="VVI":
-        Amnesia(A_only)
-        VA_input.grid(row=1, column=2, columnspan=1, padx=10, pady=10)
-        VA_Label.grid(row=2, column=2, columnspan=1, padx=10, pady=10)
-        VPW_input.grid(row=1, column=3, columnspan=1, padx=10, pady=10)
-        VPW_Label.grid(row=2, column=3, columnspan=1, padx=10, pady=10)
-        VS_input.grid(row=3, column=0, columnspan=1, padx=10, pady=10)
-        VS_Label.grid(row=4, column=0, columnspan=1, padx=10, pady=10)
-        VRP_input.grid(row=3, column=1, columnspan=1, padx=10, pady=0)
-        VRP_Label.grid(row=4, column=1, columnspan=1, padx=10, pady=0)
-        MSR_input.config(state="disabled")
-        PVARP_input.config(state="disabled")
-     '''
 
 
 def onSaveParameters():
@@ -219,73 +116,20 @@ def on_Login():
     VOOR_Button.grid(row=1, column=3)
     VVIR_Button.grid(row=0, column=3)
     Institution_Label.grid(row=2, column=1, columnspan=3, pady=(10,0))
-    
-    """
-    LRL_input.grid(row=1, column=0, columnspan=1, padx=10, pady=10)
-    LRL_Label.grid(row=2, column=0, columnspan=1, padx=10, pady=10)
-    URL_input.grid(row=1, column=1, columnspan=1, padx=10, pady=10)
-    URL_Label.grid(row=2, column=1, columnspan=1, padx=10, pady=10)
-    AA_input.grid(row=1, column=2, columnspan=1, padx=10, pady=10)
-    AA_Label.grid(row=2, column=2, columnspan=1, padx=10, pady=10)
-    APW_input.grid(row=1, column=3, columnspan=1, padx=10, pady=10)
-    APW_Label.grid(row=2, column=3, columnspan=1, padx=10, pady=10)
-    MSR_input.grid(row=1, column=4, columnspan=1, padx=10, pady=10)
-    MSR_Label.grid(row=2, column=4, columnspan=1, padx=10, pady=10)
-    AS_input.grid(row=3, column=0, columnspan=1, padx=10, pady=10)
-    AS_Label.grid(row=4, column=0, columnspan=1, padx=10, pady=10)
-    ARP_input.grid(row=3, column=1, columnspan=1, padx=10, pady=0)
-    ARP_Label.grid(row=4, column=1, columnspan=1, padx=10, pady=0)
-    PVARP_input.grid(row=3, column=2, columnspan=1, padx=10, pady=0)
-    PVARP_Label.grid(row=4, column=2, columnspan=1, padx=10, pady=0)
-    H_Label.grid(row=4, column=3, columnspan=1, padx=10, pady=0)
-    H_input.grid(row=3, column=3, columnspan=1, padx=10, pady=0)
-    RS_input.grid(row=3, column=4, columnspan=1, padx=10, pady=0)
-    RS_Label.grid(row=4, column=4, columnspan=1, padx=10, pady=0)
-    """
 
     createAllDCMItems(user_manager.getPacingMode())
-
-    
-
-    #Change_Parameters("AOO")
-
-    # VA_input.grid(row=0, column=3, columnspan=1, padx=10, pady=10)
-    # VA_Label.grid(row=1, column=3, columnspan=1, padx=10, pady=10)
-    # VPW_input.grid(row=0, column=4, columnspan=1, padx=10, pady=10)
-    # VPW_Label.grid(row=1, column=4, columnspan=1, padx=10, pady=10)
-    # AS_input.grid(row=2, column=0, columnspan=1, padx=10, pady=10)
-    # AS_Label.grid(row=3, column=0, columnspan=1, padx=10, pady=10)
-    # ARP_input.grid(row=2, column=1, columnspan=1, padx=10, pady=0)
-    # ARP_Label.grid(row=3, column=1, columnspan=1, padx=10, pady=0)
-    # PVARP_input.grid(row=2, column=1, columnspan=1, padx=10, pady=0)
-    # PVARP_Label.grid(row=3, column=1, columnspan=1, padx=10, pady=0)
-    # H_Label.grid(row=3, column=2, columnspan=1, padx=10, pady=0)
-    # H_input.grid(row=2, column=2, columnspan=1, padx=10, pady=0)
-    # RS_input.grid(row=2, column=3, columnspan=1, padx=10, pady=0)
-    # RS_Label.grid(row=3, column=3, columnspan=1, padx=10, pady=0)
-    # MSR_input.grid(row=2, column=4, columnspan=1, padx=10, pady=0)
-    # MSR_Label.grid(row=3, column=4, columnspan=1, padx=10, pady=0)
-
 
 
 def Start():
     Welcome_Frame.grid(row=0, column=0, pady=25, padx=25)
     Welcome_Label.grid(pady=(10,0), row=0,column=0, columnspan=2)
-    #Welcome_Label.pack(pady=10)
     Prompt_Label.grid(row=1, column=0, columnspan=2, pady=(0,10))
-    #Prompt_Label.pack(pady=10)
     Username_Label.grid(pady=(10,5),row=2, column=0, columnspan=2)
-    #Username_Label.pack(pady=10)
     Username_input.grid(row=3, column=0, padx=(5,10), pady=0, columnspan=2)
-    #Username_input.pack(pady=10)
     Password_Label.grid(pady=(10,5),row=4, column=0, columnspan=2)
-    #Password_Label.pack(pady=10)
     Password_input.grid(row=5, column=0, padx=10, pady=(5,30), columnspan=2)
-    #Password_input.pack(pady=10)
     Login_button.grid(row=6, column=0, padx=10, pady=0)
-    #Login_button.pack(pady=10)
     CreateUser_button.grid(row=6, column=1, padx=10, pady=0)
-    #CreateUser_button.pack(pady=10)
     return
 
 def on_registerUser():
