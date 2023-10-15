@@ -2,11 +2,15 @@ import tkinter as tk
 import user_manager 
 import GUI_helpers
 
-_VERSION_NUMBER = "1.0.5"
+# Constants
+_VERSION_NUMBER = "1.0.6"
+_ICON_BITMAP_FILEPATH = "assets/pacemaker_icon.ico"
+_WINDOW_TITLE = "Pacemaker Device Controller Monitor " + _VERSION_NUMBER
+
 root = tk.Tk()
-root.title("Pacemaker Device Controller Monitor: Version 1")
+root.title(_WINDOW_TITLE)
 root.minsize(width=100, height=200)
-root.iconbitmap("pacemaker_icon.ico")
+root.iconbitmap(_ICON_BITMAP_FILEPATH)
 
 Welcome_Frame = tk.Frame(root)
 
@@ -14,7 +18,10 @@ DCM_Frame = tk.Frame(root)
 Lower_DCM_Frame = tk.Frame(DCM_Frame)
 Upper_DCM_Frame = tk.Frame(DCM_Frame)
 
+
+# parameterEntryAndLabelList is made up of sublists: [paramName: str, paramEntry: tk.Entry, paramLabel: tk.Label]
 parameterEntryAndLabelList = []
+
 
 def Logout():
     user_manager.logoutUser()
@@ -33,11 +40,11 @@ def Logout():
     CreateUser_button.grid(row=6, column=1, padx=10, pady=10)
     return
     
+
 def Change_Parameters(mode):
     user_manager.savePacingMode(mode)
     for widget in Upper_DCM_Frame.winfo_children():
         widget.grid_forget()
-    #DCM_Frame.grid_forget()
     createAllDCMItems(mode)
 
 
@@ -50,6 +57,7 @@ def onSaveParameters():
         if not isSuccessfulSave:
             GUI_helpers.throwErrorPopup(errorMsg)
             return
+    GUI_helpers.throwSuccessPopup("Successfully saved all parameters.")
 
 
 def createAllDCMItems(mode):
@@ -77,7 +85,6 @@ def createAllDCMItems(mode):
     logout_button.grid(row=0,column=4, columnspan=1, padx=10, pady=10)
     Ver_Num_Label.grid(row=0, column=2)
     
-
     for row in range(2):
         for col in range(5):
             index = row * 5 + col
@@ -139,6 +146,8 @@ def on_registerUser():
     else:
          GUI_helpers.throwErrorPopup(errorMsg)
 
+
+# Welcome Frame
 Welcome_Label = tk.Label(Welcome_Frame, text="Welcome!",  font=("Montserrat", 16, "bold"))
 Prompt_Label = tk.Label(Welcome_Frame, text="Please login or create a new user")
 Username_Label = tk.Label(Welcome_Frame, text="Username")
@@ -149,101 +158,22 @@ Login_button = tk.Button(Welcome_Frame, text="Login", padx=10, pady=5, bg="white
 CreateUser_button = tk.Button(Welcome_Frame, text="Create New User", padx=10, pady=5, bg="white", command= on_registerUser)
 
 
-
-
-
-
-    
-        
-
-
-
-
-        
-    
-'''
-
-LRL_input = tk.Entry(Upper_DCM_Frame, width=10, bg="white", fg="blue")
-LRL_Label = tk.Label(Upper_DCM_Frame, text="Lower\nRate Limit")
-
-URL_input = tk.Entry(Upper_DCM_Frame, width=10, bg="white", fg="blue")
-URL_Label = tk.Label(Upper_DCM_Frame, text="Upper\nRate Limit")
-
-AA_input = tk.Entry(Upper_DCM_Frame, width=10, bg="white", fg="blue")
-AA_Label = tk.Label(Upper_DCM_Frame, text="Atrial\nAmplitude")
-
-APW_input = tk.Entry(Upper_DCM_Frame, width=10, bg="white", fg="blue")
-APW_Label = tk.Label(Upper_DCM_Frame, text="Atrial\nPulse Width")
-
-VA_input = tk.Entry(Upper_DCM_Frame, width=10, bg="white", fg="blue")
-VA_Label = tk.Label(Upper_DCM_Frame, text="Ventricular\nAmplitude")
-
-VPW_input = tk.Entry(Upper_DCM_Frame, width=10, bg="white", fg="blue")
-VPW_Label = tk.Label(Upper_DCM_Frame, text="Ventricular\nPulse Width")
-
-AS_input = tk.Entry(Upper_DCM_Frame, width=10, bg="white", fg="blue")
-AS_Label = tk.Label(Upper_DCM_Frame, text="Atrial\nSensitivity")
-
-VS_input = tk.Entry(Upper_DCM_Frame, width=10, bg="white", fg="blue")
-VS_Label = tk.Label(Upper_DCM_Frame, text="Vetricular\nSensitivity")
-
-ARP_input = tk.Entry(Upper_DCM_Frame, width=10, bg="white", fg="blue")
-ARP_Label = tk.Label(Upper_DCM_Frame, text="ARP")
-
-VRP_input = tk.Entry(Upper_DCM_Frame, width=10, bg="white", fg="blue")
-VRP_Label = tk.Label(Upper_DCM_Frame, text="VRP")
-
-PVARP_input = tk.Entry(Upper_DCM_Frame, width=10, bg="white", fg="blue")
-PVARP_Label = tk.Label(Upper_DCM_Frame, text="PVARP")
-
-H_input = tk.Entry(Upper_DCM_Frame, width=10, bg="white", fg="blue")
-H_Label = tk.Label(Upper_DCM_Frame, text="Hysteresis")
-
-RS_input = tk.Entry(Upper_DCM_Frame, width=10, bg="white", fg="blue")
-RS_Label = tk.Label(Upper_DCM_Frame, text="Rate\nSmoothing")
-
-MSR_input = tk.Entry(Upper_DCM_Frame, width=10, bg="white", fg="blue")
-MSR_Label = tk.Label(Upper_DCM_Frame, text="Maximum\nSensor Rate")
-
-'''
-
+# DCM Frame
 Save_Button = tk.Button(Lower_DCM_Frame, text="Save", width=10, height=4, bg="white", command=onSaveParameters)
 Ver_Num_Label = tk.Label(Upper_DCM_Frame, text="Version " + _VERSION_NUMBER)
 logout_button = tk.Button(Upper_DCM_Frame, text="Logout", bg="white", command=Logout)
+Institution_Label = tk.Label(Lower_DCM_Frame, text="McMaster University")
 
 AOO_Button = tk.Button(Lower_DCM_Frame, text="AOO", padx=10, pady=5, width=8, height=1, bg="white", command= lambda: Change_Parameters("AOO"))
 AAI_Button = tk.Button(Lower_DCM_Frame, text="AAI", padx=10, pady=5, width=8, height=1, bg="white", command= lambda: Change_Parameters("AAI"))
 VOO_Button = tk.Button(Lower_DCM_Frame, text="VOO", padx=10, pady=5, width=8, height=1, bg="white", command= lambda: Change_Parameters("VOO"))
 VVI_Button = tk.Button(Lower_DCM_Frame, text="VVI", padx=10, pady=5, width=8, height=1, bg="white", command= lambda: Change_Parameters("VVI"))
-
 AOOR_Button = tk.Button(Lower_DCM_Frame, text="AOOR", padx=10, pady=5, width=8, height=1, bg="white", command= lambda: Change_Parameters("AOOR"))
 AAIR_Button = tk.Button(Lower_DCM_Frame, text="AAIR", padx=10, pady=5, width=8, height=1, bg="white", command= lambda: Change_Parameters("AAIR"))
 VOOR_Button = tk.Button(Lower_DCM_Frame, text="VOOR", padx=10, pady=5, width=8, height=1, bg="white", command= lambda: Change_Parameters("VOOR"))
 VVIR_Button = tk.Button(Lower_DCM_Frame, text="VVIR", padx=10, pady=5, width=8, height=1, bg="white", command= lambda: Change_Parameters("VVIR"))
-Institution_Label = tk.Label(Lower_DCM_Frame, text="McMaster University")
 
-'''
-input_list = [LRL_input,
-                URL_input,
-                AA_input,
-                APW_input,
-                VA_input,
-                VPW_input,
-                AS_input,   
-                VS_input,
-                ARP_input,
-                VRP_input,
-                PVARP_input,
-                H_input,
-                RS_input,
-                MSR_input]
-
-A_only = [AA_input, AA_Label, APW_input, APW_Label, AS_input, AS_Label, ARP_input, ARP_Label]
-
-V_only = [VA_input, VA_Label, VPW_input, VPW_Label, VS_input, VS_Label, VRP_input, VRP_Label]
-'''
 
 Start()
-
 
 root.mainloop()
