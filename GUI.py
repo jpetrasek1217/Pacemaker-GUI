@@ -3,7 +3,7 @@ import user_manager
 import GUI_helpers
 
 # Constants
-_VERSION_NUMBER = "1.0.6"
+_VERSION_NUMBER = "1.0.7"
 _ICON_BITMAP_FILEPATH = "assets/pacemaker_icon.ico"
 _WINDOW_TITLE = "Pacemaker Device Controller Monitor " + _VERSION_NUMBER
 
@@ -122,6 +122,7 @@ def on_Login():
     AAIR_Button.grid(row=0, column=2)
     VOOR_Button.grid(row=1, column=3)
     VVIR_Button.grid(row=0, column=3)
+    Send_Button.grid(row=2, column=0)
     Institution_Label.grid(row=2, column=1, columnspan=3, pady=(10,0))
 
     createAllDCMItems(user_manager.getPacingMode())
@@ -145,6 +146,15 @@ def on_registerUser():
          GUI_helpers.throwSuccessPopup(f"Successfully Created New User \'{Username_input.get().strip()}\'")
     else:
          GUI_helpers.throwErrorPopup(errorMsg)
+
+EgramSend = tk.Frame(root)
+
+def OpenEgram():
+    for widget in Welcome_Frame.winfo_children():
+        widget.grid_forget()
+    Welcome_Frame.grid_forget()
+    
+    
 
 
 # Welcome Frame
@@ -173,6 +183,7 @@ AAIR_Button = tk.Button(Lower_DCM_Frame, text="AAIR", padx=10, pady=5, width=8, 
 VOOR_Button = tk.Button(Lower_DCM_Frame, text="VOOR", padx=10, pady=5, width=8, height=1, bg="white", command= lambda: Change_Parameters("VOOR"))
 VVIR_Button = tk.Button(Lower_DCM_Frame, text="VVIR", padx=10, pady=5, width=8, height=1, bg="white", command= lambda: Change_Parameters("VVIR"))
 
+Send_Button =  tk.Button(Lower_DCM_Frame, text="Send", padx=10, pady=5, width=8, height=1, bg="white", command= lambda: EgramSend.grid(row=0, column=0, pady=25, padx=25, sticky="nsew"))
 
 Start()
 
