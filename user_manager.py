@@ -127,6 +127,14 @@ def getPacingMode() -> str:
     return _activeUser.getPacingMode()
 
 
+def getAllPacingModes() -> list[str]:
+    '''Returns a list of all the pacing modes.'''
+    pacingModeList = []
+    for pacingMode in PacingModes:
+        pacingModeList.append(pacingMode.getName())
+    return pacingModeList
+
+
 def savePacingMode(pacingMode: str | PacingModes) -> tuple[bool, str]:
     '''Updates and saves the given Pacing Mode to the Active User.'''
     if isinstance(pacingMode, PacingModes):     # Checks if given type is a PacingModes
