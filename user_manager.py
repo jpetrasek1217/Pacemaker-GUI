@@ -1,5 +1,6 @@
 import re   #regex
 import local_storage
+import serial_comms
 from pacemaker_pacingmodes import PacingModes
 from pacemaker_parameters import Parameters
 from user import User
@@ -206,3 +207,9 @@ def _validateParameterValue(param: str, value: float) -> tuple[bool, str]:
         return False, f"Invalid value of \'{value}\' for Parameter \'{paramObj.getTitleNoFormatting()}\'.\n{paramObj.getAcceptableValuesString()}"
     else:
         return True, ""
+    
+
+# TODO: Remove Testing Code
+
+byteArray = serial_comms.sendParameterDataToPacemaker(_users[0].getAllParameterValues(), _users[0].getPacingMode())
+serial_comms.receiveParameterDataFromPacemaker(byteArray)
