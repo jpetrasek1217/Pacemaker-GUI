@@ -1,7 +1,7 @@
 import tkinter as tk
 
 # Constants
-_VERSION_NUMBER = "2.0.2"
+_VERSION_NUMBER = "2.0.4"
 _ICON_BITMAP_FILEPATH = "assets/pacemaker_icon.ico"
 _WINDOW_TITLE = "Pacemaker Device Controller Monitor " + _VERSION_NUMBER
 _PAD_X = 20

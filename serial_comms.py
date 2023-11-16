@@ -1,28 +1,25 @@
+from time import sleep
 import serial
 import serial.tools.list_ports as port_list
-from numpy import float16
 import struct
 from pacemaker_parameters import Parameters
 from pacemaker_pacingmodes import PacingModes
 
 
-print(f"COM PORTS: {list(port_list.comports())}")
+# --- Constants ---
 
-# --- Init ---
+_SER_BAUDRATE = 9600
+_SER_BYTESIZE = serial.EIGHTBITS
+_SER_PARTITY = serial.PARITY_NONE
+_SER_STOPBITS = serial.STOPBITS_ONE
+_SER_TIMEOUT = 1
+_SER_WRITE_TIMEOUT = 0
 
-_SER = serial.Serial()
-_SER.port = 'COM3'
-_SER.baudrate = 9600
-_SER.bytesize = serial.EIGHTBITS
-_SER.parity = serial.PARITY_EVEN
-_SER.stopbits = serial.STOPBITS_ONE
-_SER.timeout = 1
-
-_BYTE_SYNC = 0x16
-_BYTE_PARAMS_FNCODE = 0x55
+_BYTE_SYNC = 0x16   # 22 Decimal
+_BYTE_PARAMS_FNCODE = 0x55  # 85 Decimal, 'U' ASCII
 
 # THIS ORDER CANNOT CHANGE -- AGREED COMMS BETWEEN PACEMAKER AND DCM
-_paramDataStreamOrder = [
+_paramDataToSend = [
     Parameters.LOWER_RATE_LIMIT.getName(),
     Parameters.UPPER_RATE_LIMIT.getName(),
     Parameters.ATRIAL_AMPLITUDE.getName(),
@@ -34,57 +31,85 @@ _paramDataStreamOrder = [
     Parameters.VENTRICULAR_SENSITIVITY.getName(),
     Parameters.VENTRICULAR_REFACTORY_PERIOD.getName(),
     Parameters.MAX_SENSOR_RATE.getName(),
-    "THRES",
-    "REACTION",
-    "RESPONSE_FACTOR",
-    "RECOVERY",
-    "CHECKSUM"
+    #"THRES", # TODO: Figure out how to represent this data
+    Parameters.REACTION_TIME.getName(),
+    Parameters.RESPONSE_FACTOR.getName(),
+    Parameters.RECOVERY_TIME.getName(),
 ]
 
 # --- Read & Write ---
 
-def sendParameterDataToPacemaker(params: dict[str, float], pacingMode: str | PacingModes):
+def sendParameterDataToPacemaker(port: str, params: dict[str, float], pacingMode: str | PacingModes):
+    # Byte Array of all Parameter Data - Reference docs for order of data
     byteArray = bytearray(struct.pack('>B', _BYTE_SYNC))
     byteArray.extend(bytearray(struct.pack('>B', _BYTE_PARAMS_FNCODE)))
     byteArray.extend(bytearray(struct.pack('>B', _getPacingModeByte(pacingMode))))
 
-    tempCount = 0
-    for param in _paramDataStreamOrder:
+    for param in _paramDataToSend:
         if param in params:
-            tempCount += 1
             byteArray.extend((bytearray(struct.pack('>f', params[param]))))
         else:
-            continue #TODO: REMOVE
-            raise KeyError(f"Unrecognized parameter {param} in serial communication stream when writing data.")
+            raise KeyError(f"Unrecognized parameter \'{param}\' in serial communication stream when writing data.")
 
     # Checksum
     # The sum of all the bytes including checksum should equal 0xFF, so checksum = ~(sum of all other bytes)
     bytesum = sum(byteArray) & 0xFF
     checksum = (~bytesum & 0xFF)
     byteArray.extend(bytearray(struct.pack('>B', checksum)))
+    print(f"FIRST BYTE: {byteArray[0]}")
 
     print(f"BYTE DATA: {byteArray}, SUM OF BYTES: {sum(byteArray) & 0xFF}, SIZE OF PACKET: {len(byteArray)}")
-    return byteArray #TODO REMOVE
-    _writeSerialData(byteArray)
+    _writeSerialData(port, byteArray)
 
 
-def _writeSerialData(byteArray: bytearray):
-    with _SER:
-        _SER.write(byteArray)
+def _writeSerialData(port: str, byteArray: bytearray):
+    # Check that comm port is valid
+    if port not in getAvaliableCommPorts():
+        raise ValueError(f"Invalid Comm Port \'{port}\'.")
+    
+    # Write to port
+    with serial.Serial(port=port, 
+                       baudrate=_SER_BAUDRATE, 
+                       bytesize=_SER_BYTESIZE, 
+                       parity=_SER_PARTITY, 
+                       stopbits=_SER_STOPBITS, 
+                       timeout=_SER_TIMEOUT, 
+                       write_timeout=_SER_WRITE_TIMEOUT
+                      ) as ser:  
+        #ser.reset_input_buffer()   #TODO: remove if not needed
+        #ser.reset_output_buffer()
+        #sleep(1)
+        ser.write(byteArray)
+            
 
-
-def receiveParameterDataFromPacemaker(byteArray: bytearray):
-    unpackStr = '>BBB' + 'f'*(len(_paramDataStreamOrder)-5) + 'B'
-    print(byteArray)
-    print(struct.unpack(unpackStr, byteArray))
+def receiveParameterDataFromPacemaker():
+    byteArray = _readSerialData()
+    unpackStr = '>BBB' + 'f'*(len(_paramDataToSend)) + 'B'
+    return struct.unpack(unpackStr, byteArray)
 
 
 def receiveEgramDataFromPacemaker():
     pass
 
 
-def _readSerialData():
-    pass
+def _readSerialData(port: str) -> bytearray:
+    # Check that comm port is valid
+    if port not in getAvaliableCommPorts():
+        raise ValueError(f"Invalid Comm Port \'{port}\'.")
+    
+    # Read from port
+    with serial.Serial(port=port, 
+                       baudrate=_SER_BAUDRATE, 
+                       bytesize=_SER_BYTESIZE, 
+                       parity=_SER_PARTITY, 
+                       stopbits=_SER_STOPBITS, 
+                       timeout=_SER_TIMEOUT, 
+                       write_timeout=_SER_WRITE_TIMEOUT
+                      ) as ser:  
+        print(f"READING...")
+        byteArray = ser.read(50)
+        print(f"READ: {byteArray}")
+    return byteArray
 
 
 # --- Helper Functions ---
@@ -108,3 +133,7 @@ def _getPacingModeByte(pacingMode: str | PacingModes) -> bytes:
         return 0x07
     else:
         raise ValueError("Given parameter is not a Pacing Mode.")
+    
+
+def getAvaliableCommPorts() -> list[str]:
+    return [port.name for port in port_list.comports()]

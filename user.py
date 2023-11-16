@@ -71,8 +71,21 @@ class User:
                 self._params[key] = value
 
 
-    def addMissingParameters(self, params: dict[str: float]) -> None:
-        '''Adds all missing items in given dictionary to the User's Pacemaker Parameters.'''
+    def correlateSavedParameters(self, params: dict[str: float]) -> None:
+        '''Correlates and updates the User's saved Parameters with the master Pacemaker Parameters list.
+        Adds any missing parameters and removes any unused parameters.'''
+        # Adds missing parameters to user's param list
         for key in params:
             if key not in self._params:
                 self._params[key] = params[key]
+
+        # Removes extra parameters from user's param list (if master parameter list changes & removes parameters)
+        keysToRemove = []
+        for key in self._params:
+            if key not in params:
+                keysToRemove.append(key)
+
+        # If there are any keys to remove, remove them from the user's param list
+        if keysToRemove:
+            for key in keysToRemove:
+                self._params.pop(key)

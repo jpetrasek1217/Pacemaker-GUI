@@ -19,9 +19,6 @@ class PacingModes(Enum):
         Parameters.ATRIAL_PULSE_WIDTH,
         Parameters.ATRIAL_SENSITIVITY,
         Parameters.ATRIAL_REFACTORY_PERIOD,
-        Parameters.PVARP,
-        Parameters.HYSTERESIS,
-        Parameters.RATE_SMOOTHING,
     ]
 
     AOOR = _PACING_TYPE_ATRIAL, [
@@ -30,6 +27,9 @@ class PacingModes(Enum):
         Parameters.ATRIAL_AMPLITUDE,
         Parameters.ATRIAL_PULSE_WIDTH,
         Parameters.MAX_SENSOR_RATE,
+        Parameters.REACTION_TIME,
+        Parameters.RESPONSE_FACTOR,
+        Parameters.RECOVERY_TIME,
     ]
 
     AAIR = _PACING_TYPE_ATRIAL, [
@@ -39,10 +39,10 @@ class PacingModes(Enum):
         Parameters.ATRIAL_PULSE_WIDTH,
         Parameters.ATRIAL_SENSITIVITY,
         Parameters.ATRIAL_REFACTORY_PERIOD,
-        Parameters.PVARP,
-        Parameters.HYSTERESIS,
-        Parameters.RATE_SMOOTHING,
         Parameters.MAX_SENSOR_RATE,
+        Parameters.REACTION_TIME,
+        Parameters.RESPONSE_FACTOR,
+        Parameters.RECOVERY_TIME,
     ]
 
     # Generic Object for all Atrial Parameters
@@ -53,10 +53,10 @@ class PacingModes(Enum):
         Parameters.ATRIAL_PULSE_WIDTH,
         Parameters.ATRIAL_SENSITIVITY,
         Parameters.ATRIAL_REFACTORY_PERIOD,
-        Parameters.PVARP,
-        Parameters.HYSTERESIS,
-        Parameters.RATE_SMOOTHING,
         Parameters.MAX_SENSOR_RATE,
+        Parameters.REACTION_TIME,
+        Parameters.RESPONSE_FACTOR,
+        Parameters.RECOVERY_TIME,
     ]
 
     VOO = _PACING_TYPE_VENTRICULAR, [
@@ -73,8 +73,6 @@ class PacingModes(Enum):
         Parameters.VENTRICULAR_PULSE_WIDTH,
         Parameters.VENTRICULAR_SENSITIVITY,
         Parameters.VENTRICULAR_REFACTORY_PERIOD,
-        Parameters.HYSTERESIS,
-        Parameters.RATE_SMOOTHING,
     ]
 
     VOOR = _PACING_TYPE_VENTRICULAR, [
@@ -83,6 +81,9 @@ class PacingModes(Enum):
         Parameters.VENTRICULAR_AMPLITUDE,
         Parameters.VENTRICULAR_PULSE_WIDTH,
         Parameters.MAX_SENSOR_RATE,
+        Parameters.REACTION_TIME,
+        Parameters.RESPONSE_FACTOR,
+        Parameters.RECOVERY_TIME,
     ]
 
     VVIR = _PACING_TYPE_VENTRICULAR, [
@@ -92,9 +93,10 @@ class PacingModes(Enum):
         Parameters.VENTRICULAR_PULSE_WIDTH,
         Parameters.VENTRICULAR_SENSITIVITY,
         Parameters.VENTRICULAR_REFACTORY_PERIOD,
-        Parameters.HYSTERESIS,
-        Parameters.RATE_SMOOTHING,
         Parameters.MAX_SENSOR_RATE,
+        Parameters.REACTION_TIME,
+        Parameters.RESPONSE_FACTOR,
+        Parameters.RECOVERY_TIME,
     ]
 
     # Generic Object for all Ventricular Parameters
@@ -105,9 +107,10 @@ class PacingModes(Enum):
         Parameters.VENTRICULAR_PULSE_WIDTH,
         Parameters.VENTRICULAR_SENSITIVITY,
         Parameters.VENTRICULAR_REFACTORY_PERIOD,
-        Parameters.HYSTERESIS,
-        Parameters.RATE_SMOOTHING,
         Parameters.MAX_SENSOR_RATE,
+        Parameters.REACTION_TIME,
+        Parameters.RESPONSE_FACTOR,
+        Parameters.RECOVERY_TIME,
     ]
 
     def __init__(self, pacingType: str, listOfParameters: list[Parameters]) -> None:

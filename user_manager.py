@@ -15,7 +15,7 @@ _REGEX_VALID_CHARS = "^[a-zA-Z0-9]*$"
 _users: list[User] = local_storage.readUsersFromFile()
 _activeUser: User | None = None
 for user in _users:
-    user.addMissingParameters(Parameters.getNominalValues())
+    user.correlateSavedParameters(Parameters.getNominalValues())
 
 
 # --- Login, Register, Delete Users ---
@@ -207,9 +207,13 @@ def _validateParameterValue(param: str, value: float) -> tuple[bool, str]:
         return False, f"Invalid value of \'{value}\' for Parameter \'{paramObj.getTitleNoFormatting()}\'.\n{paramObj.getAcceptableValuesString()}"
     else:
         return True, ""
-    
 
-# TODO: Remove Testing Code
 
-byteArray = serial_comms.sendParameterDataToPacemaker(_users[0].getAllParameterValues(), _users[0].getPacingMode())
-serial_comms.receiveParameterDataFromPacemaker(byteArray)
+# --- Send and Receive Pacemaker Data ---
+
+
+def sendParameterDataToPacemaker() -> tuple[bool, str]:
+    pass
+
+# TODO: TESTING
+# print(serial_comms.receiveParameterDataFromPacemaker(serial_comms.sendParameterDataToPacemaker('COM5', _users[0].getAllParameterValues(), _users[0].getPacingMode())))

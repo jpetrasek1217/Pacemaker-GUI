@@ -6,16 +6,19 @@ class Parameters(Enum):
     UPPER_RATE_LIMIT = "Upper Rate\nLimit", "ppm", 120.0, 50.0, 175.0
     ATRIAL_AMPLITUDE = "Atrial\nAmplitude", "V", 3.5, 0.5, 7.0, 0.0
     ATRIAL_PULSE_WIDTH = "Atrial\nPulse Width", "ms", 0.4, 0.1, 1.9, 0.05
-    ATRIAL_REFACTORY_PERIOD = "Atrial\nRefractory Period", "ms", 250.0, 150.0, 500.0
     ATRIAL_SENSITIVITY = "Atrial\nSensitivity", "mV", 0.75, 1.0, 10.0, 0.25, 0.5, 0.75
+    ATRIAL_REFACTORY_PERIOD = "Atrial\nRefractory Period", "ms", 250.0, 150.0, 500.0
     VENTRICULAR_AMPLITUDE = "Ventricular\nAmplitude", "V", 3.5, 0.5, 7.0, 0.0
     VENTRICULAR_PULSE_WIDTH = "Ventricular\nPulse Width", "ms", 0.4, 0.1, 1.9, 0.05
-    VENTRICULAR_REFACTORY_PERIOD = "Ventricular\nRefractory Period", "ms", 320.0, 150.0, 500.0
     VENTRICULAR_SENSITIVITY = "Ventricular\nSensitivity", "mV", 2.5, 1.0, 10.0, 0.25, 0.5, 0.75
-    HYSTERESIS = "Hysteresis", "ms", 0.0, 30.0, 175.0, 0.0
-    RATE_SMOOTHING = "Rate\nSmoothing", "%", 0.0, 3.0, 25.0, 0.0
+    VENTRICULAR_REFACTORY_PERIOD = "Ventricular\nRefractory Period", "ms", 320.0, 150.0, 500.0
     MAX_SENSOR_RATE = "Max Sensor\nRate", "ppm", 120.0, 50.0, 175.0
-    PVARP = "PVARP", "ms", 250.0, 150.0, 500.0
+    REACTION_TIME = "Reaction\nTime", "sec", 30.0, 10.0, 50.0
+    RESPONSE_FACTOR = "Response\nFactor", "", 8.0, 1.0, 16.0
+    RECOVERY_TIME = "Recovery\nTime", "min", 5.0, 2.0, 16.0
+    # HYSTERESIS = "Hysteresis", "ms", 0.0, 30.0, 175.0, 0.0
+    # RATE_SMOOTHING = "Rate\nSmoothing", "%", 0.0, 3.0, 25.0, 0.0
+    # PVARP = "PVARP", "ms", 250.0, 150.0, 500.0
 
     def __init__(self, title: str, units: str, nominalValue: float, lowerLimit: float, upperLimit: float, *args: float) -> None:
         super().__init__()
