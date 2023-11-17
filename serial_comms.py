@@ -31,7 +31,6 @@ _paramDataToSend = [
     Parameters.VENTRICULAR_SENSITIVITY.getName(),
     Parameters.VENTRICULAR_REFACTORY_PERIOD.getName(),
     Parameters.MAX_SENSOR_RATE.getName(),
-    #"THRES", # TODO: Figure out how to represent this data
     Parameters.REACTION_TIME.getName(),
     Parameters.RESPONSE_FACTOR.getName(),
     Parameters.RECOVERY_TIME.getName(),
@@ -39,7 +38,7 @@ _paramDataToSend = [
 
 # --- Read & Write ---
 
-def sendParameterDataToPacemaker(port: str, params: dict[str, float], pacingMode: str | PacingModes):
+def sendParameterDataToPacemaker(port: str, params: dict[str, float], pacingMode: str | PacingModes, threshold: float):
     # Byte Array of all Parameter Data - Reference docs for order of data
     byteArray = bytearray(struct.pack('>B', _BYTE_SYNC))
     byteArray.extend(bytearray(struct.pack('>B', _BYTE_PARAMS_FNCODE)))
@@ -50,6 +49,8 @@ def sendParameterDataToPacemaker(port: str, params: dict[str, float], pacingMode
             byteArray.extend((bytearray(struct.pack('>f', params[param]))))
         else:
             raise KeyError(f"Unrecognized parameter \'{param}\' in serial communication stream when writing data.")
+        
+    byteArray.extend(bytearray(struct.pack('>B', threshold)))
 
     # Checksum
     # The sum of all the bytes including checksum should equal 0xFF, so checksum = ~(sum of all other bytes)
@@ -133,7 +134,7 @@ def _getPacingModeByte(pacingMode: str | PacingModes) -> bytes:
         return 0x07
     else:
         raise ValueError("Given parameter is not a Pacing Mode.")
-    
+
 
 def getAvaliableCommPorts() -> list[str]:
     return [port.name for port in port_list.comports()]

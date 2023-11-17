@@ -1,9 +1,10 @@
 class User:
-    def __init__(self, username: str, password: str, pacingMode: str, params: dict[str: float]) -> None:
+    def __init__(self, username: str, password: str, pacingMode: str, params: dict[str: float], threshold: float) -> None:
         self._username = str(username)
         self._password = str(password)
         self._pacingMode = str(pacingMode)
         self._params = params
+        self._threshold = float(threshold)
 
     def __repr__(self) -> str:
         s = f"\nuser.User object:\n\tUSERNAME: {self._username}\n\tPASSWORD: {self._password}\n"
@@ -35,6 +36,13 @@ class User:
         '''Sets the User's Pacing Mode.'''
         self._pacingMode = str(pacingMode)
 
+    
+    def getThreshold(self) -> float:
+        return self._threshold
+
+
+    def setThreshold(self, threshold: float) -> None:
+        self._threshold = float(threshold)
 
     def getParameterValue(self, key: str) -> float:
         '''Returns the value of the specified Pacemaker Parameter.'''

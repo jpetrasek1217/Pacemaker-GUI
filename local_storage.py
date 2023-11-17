@@ -6,6 +6,7 @@ _USERNAME_KEY = "USERNAME"
 _PASSWORD_KEY = "PASSWORD"
 _PACINGMODE_KEY = "PACING_MODE"
 _PARAMS_KEY = "PARAMETERS"
+_THRES_KEY = "THRESHOLD"
 
 def readUsersFromFile() -> list[User]:
     '''Reads all the saved User data from the User data file, returns a list of User Objects.'''
@@ -16,7 +17,8 @@ def readUsersFromFile() -> list[User]:
         passwordStr = userDict[_PASSWORD_KEY]
         pacingModeStr = userDict[_PACINGMODE_KEY]
         parametersDict = userDict[_PARAMS_KEY]
-        user = User(usernameStr, passwordStr, pacingModeStr, parametersDict)
+        thresholdFloat = userDict[_THRES_KEY]
+        user = User(usernameStr, passwordStr, pacingModeStr, parametersDict, thresholdFloat)
         users.append(user)
     return users
 
@@ -37,6 +39,7 @@ def writeUsersToFile(users: list[User]) -> None:
         userDict[_PASSWORD_KEY] = user.getPassword()
         userDict[_PACINGMODE_KEY] = user.getPacingMode()
         userDict[_PARAMS_KEY] = user.getAllParameterValues()
+        userDict[_THRES_KEY] = user.getThreshold()
         userDictList.append(userDict)
     _writeToJSONFile(_USERS_FILEPATH, userDictList)
 

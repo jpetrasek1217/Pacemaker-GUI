@@ -18,6 +18,7 @@
       "REACTION_TIME": 30.0,
       "RESPONSE_FACTOR": 8.0,
       "RECOVERY_TIME": 5.0
-    }
+    },
+    "THRESHOLD": 2.0
   }
 ]

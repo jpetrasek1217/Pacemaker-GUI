@@ -3,6 +3,7 @@ import local_storage
 import serial_comms
 from pacemaker_pacingmodes import PacingModes
 from pacemaker_parameters import Parameters
+from pacemaker_thresholds import Thresholds
 from user import User
 
 
@@ -59,7 +60,7 @@ def registerUser(username: str, password: str) -> tuple[bool, str]:
     if not usernameAvaliable:                               
         return False, f"Username \'{usernameFormatted}\' already exists."
     
-    newUser = User(usernameFormatted, passwordFormatted, PacingModes.getInitialPacingMode(), Parameters.getNominalValues())    # If username is avaliable, create new user and save user locally
+    newUser = User(usernameFormatted, passwordFormatted, PacingModes.getInitialPacingMode(), Parameters.getNominalValues(), Thresholds.getNominalValue())    # If username is avaliable, create new user and save user locally
     _users.append(newUser)
     local_storage.writeUsersToFile(_users)
     return True, ""
@@ -207,6 +208,22 @@ def _validateParameterValue(param: str, value: float) -> tuple[bool, str]:
         return False, f"Invalid value of \'{value}\' for Parameter \'{paramObj.getTitleNoFormatting()}\'.\n{paramObj.getAcceptableValuesString()}"
     else:
         return True, ""
+    
+
+# --- Threshold Enum ---
+
+def getThresholdTitles() -> list[str]:
+    return list(Thresholds.getThresholdTitles().values())
+
+
+def setThresholdValueFromTitle(thresholdTitle: str) -> None:
+    if thresholdTitle in getThresholdTitles():
+        thresholdTitleDict = Thresholds.getThresholdTitles()
+        for name, title in thresholdTitleDict.items():
+            if title == thresholdTitle:
+                thresholdValue = Thresholds.getThresholdValues()[name]
+                _activeUser.setThreshold(thresholdValue)
+    return list(Thresholds.getThresholdTitles().values())
 
 
 # --- Send and Receive Pacemaker Data ---
@@ -216,4 +233,5 @@ def sendParameterDataToPacemaker() -> tuple[bool, str]:
     pass
 
 # TODO: TESTING
+
 # print(serial_comms.receiveParameterDataFromPacemaker(serial_comms.sendParameterDataToPacemaker('COM5', _users[0].getAllParameterValues(), _users[0].getPacingMode())))
