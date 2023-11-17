@@ -257,7 +257,3 @@ def sendParameterDataToPacemaker() -> tuple[bool, str]:
                                               _activeUser.getPacingMode(),
                                               _activeUser.getThreshold()
                                              )
-
-
-_activeUser = _users[0]
-print(getThresholdTitle())

@@ -11,7 +11,6 @@ _WELCOME_ENTRY_WIDTH = global_vars._WELCOME_ENTRY_WIDTH
 _ENTRY_BG = global_vars._ENTRY_BG
 _ENTRY_FG = global_vars._ENTRY_FG
 _FONT_DEFAULT = global_vars._FONT_DEFAULT
-_ENTRY_HEIGHT = global_vars._ENTRY_HEIGHT
 
 root = global_vars.root
 
