@@ -223,6 +223,13 @@ def getThresholdTitles() -> list[str]:
     return list(Thresholds.getThresholdTitles().values())
 
 
+def getThresholdTitle() -> str:
+    thresholdValueDict = Thresholds.getThresholdValues()
+    for name, value in thresholdValueDict.items():
+        if value == _activeUser.getThreshold():
+            return Thresholds.getThresholdTitles()[name]
+
+
 def setThresholdValueFromTitle(thresholdTitle: str) -> None:
     if thresholdTitle in getThresholdTitles():
         thresholdTitleDict = Thresholds.getThresholdTitles()
@@ -234,7 +241,6 @@ def setThresholdValueFromTitle(thresholdTitle: str) -> None:
 
 
 # --- Send and Receive Pacemaker Data ---
-
 
 def getAvaliableCommPorts() -> list[str]:
     return serial_comms.getAvaliableCommPorts()
@@ -251,3 +257,7 @@ def sendParameterDataToPacemaker() -> tuple[bool, str]:
                                               _activeUser.getPacingMode(),
                                               _activeUser.getThreshold()
                                              )
+
+
+_activeUser = _users[0]
+print(getThresholdTitle())
