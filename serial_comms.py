@@ -50,7 +50,7 @@ def sendParameterDataToPacemaker(port: str, params: dict[str, float], pacingMode
         else:
             raise KeyError(f"Unrecognized parameter \'{param}\' in serial communication stream when writing data.")
         
-    byteArray.extend(bytearray(struct.pack('>B', threshold)))
+    byteArray.extend(bytearray(struct.pack('>f', threshold)))
 
     # Checksum
     # The sum of all the bytes including checksum should equal 0xFF, so checksum = ~(sum of all other bytes)

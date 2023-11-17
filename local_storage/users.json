@@ -2,7 +2,7 @@
   {
     "USERNAME": "admin",
     "PASSWORD": "3K04",
-    "PACING_MODE": "AAIR",
+    "PACING_MODE": "AAI",
     "PARAMETERS": {
       "LOWER_RATE_LIMIT": 70.0,
       "UPPER_RATE_LIMIT": 120.0,

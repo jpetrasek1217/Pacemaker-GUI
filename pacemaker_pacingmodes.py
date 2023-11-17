@@ -10,7 +10,7 @@ class PacingModes(Enum):
         Parameters.UPPER_RATE_LIMIT,
         Parameters.ATRIAL_AMPLITUDE,
         Parameters.ATRIAL_PULSE_WIDTH,
-    ]
+    ], False
 
     AAI = _PACING_TYPE_ATRIAL, [
         Parameters.LOWER_RATE_LIMIT,
@@ -19,7 +19,7 @@ class PacingModes(Enum):
         Parameters.ATRIAL_PULSE_WIDTH,
         Parameters.ATRIAL_SENSITIVITY,
         Parameters.ATRIAL_REFACTORY_PERIOD,
-    ]
+    ], False
 
     AOOR = _PACING_TYPE_ATRIAL, [
         Parameters.LOWER_RATE_LIMIT,
@@ -30,7 +30,7 @@ class PacingModes(Enum):
         Parameters.REACTION_TIME,
         Parameters.RESPONSE_FACTOR,
         Parameters.RECOVERY_TIME,
-    ]
+    ], True
 
     AAIR = _PACING_TYPE_ATRIAL, [
         Parameters.LOWER_RATE_LIMIT,
@@ -43,7 +43,7 @@ class PacingModes(Enum):
         Parameters.REACTION_TIME,
         Parameters.RESPONSE_FACTOR,
         Parameters.RECOVERY_TIME,
-    ]
+    ], True
 
     # Generic Object for all Atrial Parameters
     _AXXX = _PACING_TYPE_ATRIAL, [
@@ -57,14 +57,14 @@ class PacingModes(Enum):
         Parameters.REACTION_TIME,
         Parameters.RESPONSE_FACTOR,
         Parameters.RECOVERY_TIME,
-    ]
+    ], True
 
     VOO = _PACING_TYPE_VENTRICULAR, [
         Parameters.LOWER_RATE_LIMIT,
         Parameters.UPPER_RATE_LIMIT,
         Parameters.VENTRICULAR_AMPLITUDE,
         Parameters.VENTRICULAR_PULSE_WIDTH,
-    ]
+    ], False
 
     VVI = _PACING_TYPE_VENTRICULAR, [
         Parameters.LOWER_RATE_LIMIT,
@@ -73,7 +73,7 @@ class PacingModes(Enum):
         Parameters.VENTRICULAR_PULSE_WIDTH,
         Parameters.VENTRICULAR_SENSITIVITY,
         Parameters.VENTRICULAR_REFACTORY_PERIOD,
-    ]
+    ], False
 
     VOOR = _PACING_TYPE_VENTRICULAR, [
         Parameters.LOWER_RATE_LIMIT,
@@ -84,7 +84,7 @@ class PacingModes(Enum):
         Parameters.REACTION_TIME,
         Parameters.RESPONSE_FACTOR,
         Parameters.RECOVERY_TIME,
-    ]
+    ], True
 
     VVIR = _PACING_TYPE_VENTRICULAR, [
         Parameters.LOWER_RATE_LIMIT,
@@ -97,7 +97,7 @@ class PacingModes(Enum):
         Parameters.REACTION_TIME,
         Parameters.RESPONSE_FACTOR,
         Parameters.RECOVERY_TIME,
-    ]
+    ], True
 
     # Generic Object for all Ventricular Parameters
     _VXXX = _PACING_TYPE_VENTRICULAR, [
@@ -111,12 +111,13 @@ class PacingModes(Enum):
         Parameters.REACTION_TIME,
         Parameters.RESPONSE_FACTOR,
         Parameters.RECOVERY_TIME,
-    ]
+    ], True
 
-    def __init__(self, pacingType: str, listOfParameters: list[Parameters]) -> None:
+    def __init__(self, pacingType: str, listOfParameters: list[Parameters], isThresholdVisible: bool) -> None:
         super().__init__()
         self._pacingType = str(pacingType) # Atrial or Ventricular
         self._params = list(listOfParameters)
+        self._isThresholdVisible = bool(isThresholdVisible)
         self._checkValues()
 
     def _checkValues(self) -> None:
@@ -131,6 +132,9 @@ class PacingModes(Enum):
     def getParameters(self) -> list[Parameters]:
         '''Returns a list of the Pacing Mode's Parameters as Pacing Mode Parameter objects.'''
         return self._params
+    
+    def isThresholdVisible(self) -> bool:
+        return self._isThresholdVisible
     
     @classmethod
     def getInitialPacingMode(cls) -> str:

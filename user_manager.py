@@ -18,6 +18,8 @@ _activeUser: User | None = None
 for user in _users:
     user.correlateSavedParameters(Parameters.getNominalValues())
 
+_serialCommPort = ''
+
 
 # --- Login, Register, Delete Users ---
 
@@ -212,6 +214,11 @@ def _validateParameterValue(param: str, value: float) -> tuple[bool, str]:
 
 # --- Threshold Enum ---
 
+
+def isThresholdVisible() -> bool:
+    return PacingModes[_activeUser.getPacingMode()].isThresholdVisible()
+
+
 def getThresholdTitles() -> list[str]:
     return list(Thresholds.getThresholdTitles().values())
 
@@ -229,9 +236,18 @@ def setThresholdValueFromTitle(thresholdTitle: str) -> None:
 # --- Send and Receive Pacemaker Data ---
 
 
+def getAvaliableCommPorts() -> list[str]:
+    return serial_comms.getAvaliableCommPorts()
+
+
+def setCommPort(port: str) -> None:
+    global _serialCommPort
+    _serialCommPort = str(port)
+
+
 def sendParameterDataToPacemaker() -> tuple[bool, str]:
-    pass
-
-# TODO: TESTING
-
-# print(serial_comms.receiveParameterDataFromPacemaker(serial_comms.sendParameterDataToPacemaker('COM5', _users[0].getAllParameterValues(), _users[0].getPacingMode())))
+    serial_comms.sendParameterDataToPacemaker(_serialCommPort,
+                                              _activeUser.getAllParameterValues(),
+                                              _activeUser.getPacingMode(),
+                                              _activeUser.getThreshold()
+                                             )
