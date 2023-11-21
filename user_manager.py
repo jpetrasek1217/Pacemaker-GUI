@@ -18,8 +18,6 @@ _activeUser: User | None = None
 for user in _users:
     user.correlateSavedParameters(Parameters.getNominalValues())
 
-_serialCommPort = ''
-
 
 # --- Login, Register, Delete Users ---
 
@@ -242,18 +240,30 @@ def setThresholdValueFromTitle(thresholdTitle: str) -> None:
 
 # --- Send and Receive Pacemaker Data ---
 
-def getAvaliableCommPorts() -> list[str]:
-    return serial_comms.getAvaliableCommPorts()
+def connectToPacemaker() -> tuple[bool, str]:
+    serial_comms.connectToPacemaker()
+    if not serial_comms.isPacemakerConnected():
+        return False, "Unable to find Pacemaker, please verify the Pacemaker is connected."
+    else:
+        return True, ""
+    
 
-
-def setCommPort(port: str) -> None:
-    global _serialCommPort
-    _serialCommPort = str(port)
+def disconnectFromPacemaker() -> tuple[bool, str]:
+    serial_comms.disconnectToPacemaker()
+    return True, ""
 
 
 def sendParameterDataToPacemaker() -> tuple[bool, str]:
-    serial_comms.sendParameterDataToPacemaker(_serialCommPort,
-                                              _activeUser.getAllParameterValues(),
+    if not serial_comms.isPacemakerConnected():
+        return False, "Unable to find Pacemaker, please verify the Pacemaker is connected and press 'Link\'."
+    
+    serial_comms.sendParameterDataToPacemaker(_activeUser.getAllParameterValues(),
                                               _activeUser.getPacingMode(),
                                               _activeUser.getThreshold()
                                              )
+    
+
+# # TODO: TESTING
+# _activeUser = _users[0]
+# connectToPacemaker()
+# sendParameterDataToPacemaker()

@@ -44,6 +44,7 @@ class User:
     def setThreshold(self, threshold: float) -> None:
         self._threshold = float(threshold)
 
+
     def getParameterValue(self, key: str) -> float:
         '''Returns the value of the specified Pacemaker Parameter.'''
         keyExists = isinstance(self._params.get(key), float)    # Check if key exists in user's parameters
