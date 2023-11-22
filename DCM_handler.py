@@ -27,7 +27,8 @@ lowerDCMFrame = global_vars.lowerDCMFrame
 middleDCMFrame = global_vars.middleDCMFrame
 upperDCMFrame = global_vars.upperDCMFrame
 
-parameterEntryAndLabelList = global_vars.parameterEntryAndLabelList
+# parameterEntryAndLabelList is made up of sublists: [paramName: str, paramEntry: tk.Entry, paramLabel: tk.Label]
+parameterEntryAndLabelList = []
 
 def createAndShowDCM(mode):
     DCMFrame.grid(row=0, column=0, pady=25, padx=25, sticky="nsew")
@@ -71,6 +72,7 @@ def updateParameters(mode):
     for widget in middleDCMFrame.winfo_children():
         widget.grid_forget()
     
+    global parameterEntryAndLabelList
     parameterEntryAndLabelList = []
     for parameter in user_manager.getAllSavedParametersAndVisibilityFromSavedPacingMode():
         paramName = parameter[0]
@@ -118,7 +120,7 @@ def logout():
     return
 
 def onSaveParameters():
-    for paramEntryAndLabel in global_vars.parameterEntryAndLabelList:
+    for paramEntryAndLabel in parameterEntryAndLabelList:
         paramName = paramEntryAndLabel[0]
         paramEntry = paramEntryAndLabel[1]
         isSuccessfulSave, errorMsg = user_manager.saveParameterValue(paramName, paramEntry.get())
@@ -126,4 +128,5 @@ def onSaveParameters():
             GUI_helpers.throwErrorPopup(errorMsg)
             return
     user_manager.setThresholdValueFromTitle(_SELECTED_OPTION.get())
+    updateParameters(user_manager.getPacingMode())
     GUI_helpers.throwSuccessPopup("Successfully saved all parameters.")
