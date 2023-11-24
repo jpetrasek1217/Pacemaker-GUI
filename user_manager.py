@@ -163,7 +163,7 @@ def getAllSavedParametersAndVisibilityFromSavedPacingMode() -> list[tuple[str, s
     for paramObj in listOfParamObjs:
         paramObjName = paramObj.getName()
         listOfParams.append((paramObjName,
-                             paramObj.getTitle() + '\n[' + paramObj.getUnits() + ']',   # Formatting for the GUI
+                             paramObj.getTitle() + ('\n[' + paramObj.getUnits() + ']' if len(paramObj.getUnits()) > 0 else '\n'),   # Formatting for the GUI
                             _activeUser.getParameterValue(paramObjName),
                             _isParameterVisible(paramObjName),
                             ))
@@ -190,7 +190,7 @@ def saveParameterValue(param: str | Parameters, value: float) -> tuple[bool, str
     if(not isValidParamValue):
         return False, errorMsg
     
-    _activeUser.setParameterValue(param, float(value))
+    _activeUser.setParameterValue(param, round(float(value), Parameters[param].getDecimalPlaces()))
     local_storage.writeUsersToFile(_users)
     return True, ""
 
@@ -254,15 +254,14 @@ def disconnectFromPacemaker() -> tuple[bool, str]:
 
 
 def sendParameterDataToPacemaker() -> tuple[bool, str]:
-    if not serial_comms.isPacemakerConnected():
-        return False, "Unable to find Pacemaker, please verify the Pacemaker is connected and press 'Link\'."
+    #if not serial_comms.isPacemakerConnected():
+    #    return False, "Unable to find Pacemaker, please verify the Pacemaker is connected and press 'Link\'."
     
     serial_comms.sendParameterDataToPacemaker(_activeUser.getAllParameterValues(),
                                               _activeUser.getPacingMode(),
                                               _activeUser.getThreshold()
                                              )
     
-
 # TODO: TESTING
 # _activeUser = _users[0]
 # connectToPacemaker()
