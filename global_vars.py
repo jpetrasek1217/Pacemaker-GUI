@@ -5,8 +5,8 @@ import tkinter.font as tkFont
 _VERSION_NUMBER = "2.1.0"
 _ICON_BITMAP_FILEPATH = "assets/pacemaker_icon.ico"
 _WINDOW_TITLE = "Pacemaker Device Controller Monitor " + _VERSION_NUMBER
-_PAD_X = 20
-_PAD_Y = 10
+_PAD_X = 16
+_PAD_Y = 8
 _BUTTON_WIDTH = 10
 _BUTTON_BG = "white"
 _WELCOME_ENTRY_WIDTH = 25
