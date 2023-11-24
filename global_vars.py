@@ -2,7 +2,7 @@ import tkinter as tk
 import tkinter.font as tkFont
 
 # Constants
-_VERSION_NUMBER = "2.0.9"
+_VERSION_NUMBER = "2.1.0"
 _ICON_BITMAP_FILEPATH = "assets/pacemaker_icon.ico"
 _WINDOW_TITLE = "Pacemaker Device Controller Monitor " + _VERSION_NUMBER
 _PAD_X = 20
@@ -15,6 +15,7 @@ _ENTRY_HEIGHT = 5
 _ENTRY_BG = "white"
 _ENTRY_FG = "black"
 _FONT_DEFAULT = ("Arial", 16)
+_FONT_DICT_DEFAULT = {"family": "Arial", "size": 16}
 
 
 root = tk.Tk()
@@ -30,6 +31,8 @@ DCMFrame = tk.Frame(root)
 lowerDCMFrame = tk.Frame(DCMFrame)
 middleDCMFrame = tk.Frame(DCMFrame)
 upperDCMFrame = tk.Frame(DCMFrame)
+
+egramFrame = tk.Frame(root)
 
 # parameterEntryAndLabelList is made up of sublists: [paramName: str, paramEntry: tk.Entry, paramLabel: tk.Label]
 parameterEntryAndLabelList = []

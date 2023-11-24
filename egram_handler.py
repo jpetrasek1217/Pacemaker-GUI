@@ -3,6 +3,9 @@ import global_vars
 import GUI_helpers
 import DCM_handler
 import user_manager
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
+import numpy as np
 
 _BUTTON_WIDTH = global_vars._BUTTON_WIDTH
 _FONT_DEFAULT = global_vars._FONT_DEFAULT
@@ -12,43 +15,43 @@ _PAD_Y = global_vars._PAD_Y
 _PAD_X = global_vars._PAD_X
 _LINK_BG = "CadetBlue1"
 _UNLINK_BG = "misty rose"
-
-
+_FONT_DICT_DEFAULT = global_vars._FONT_DICT_DEFAULT
 
 root = global_vars.root
 
-welcomeFrame = tk.Frame(root)
+welcomeFrame = global_vars.welcomeFrame
 
 DCMFrame = global_vars.DCMFrame
 lowerDCMFrame = global_vars.lowerDCMFrame
 middleDCMFrame = global_vars.middleDCMFrame
 upperDCMFrame = global_vars.upperDCMFrame
-
-egramFrame = tk.Frame(root)
+egramFrame = global_vars.egramFrame
 
 def openEgram():
     DCM_handler.onSaveParameters()
     GUI_helpers.hideFrame(DCMFrame)
     egramFrame.grid(row=0, column=0, pady=25, padx=25, sticky="nsew")
-    egramDCMButton = tk.Button(egramFrame, width=_BUTTON_WIDTH, text="DCM", font=_FONT_DEFAULT, bg=_BUTTON_BG, command=openDCM)
+    upperEgramFrame = tk.Frame(egramFrame)
+    upperEgramFrame.grid(row=0, column=0, sticky="nsew")
+    egramDCMButton = tk.Button(upperEgramFrame, width=_BUTTON_WIDTH, text="DCM", font=_FONT_DEFAULT, bg=_BUTTON_BG, command=openDCM)
     egramDCMButton.grid(row=0, column=0)
-    egramLogoutButton = tk.Button(egramFrame, width=_BUTTON_WIDTH, text="Logout", font=_FONT_DEFAULT, bg=_BUTTON_BG, command=DCM_handler.logout)
+    egramLogoutButton = tk.Button(upperEgramFrame, width=_BUTTON_WIDTH, text="Logout", font=_FONT_DEFAULT, bg=_BUTTON_BG, command=DCM_handler.logout)
     egramLogoutButton.grid(row=1, column=0)
-    institutionLabel = tk.Label(egramFrame, text="McMaster University", padx=_PAD_X*4, font=_FONT_DEFAULT)
+    institutionLabel = tk.Label(upperEgramFrame, text="McMaster University", padx=_PAD_X*4, font=_FONT_DEFAULT)
     institutionLabel.grid(row=1, column=1, pady=(0,_PAD_Y))
-    verNumLabel = tk.Label(egramFrame, text="Version " + _VERSION_NUMBER, padx=_PAD_X*4, font=_FONT_DEFAULT)
+    verNumLabel = tk.Label(upperEgramFrame, text="Version " + _VERSION_NUMBER, padx=_PAD_X*4, font=_FONT_DEFAULT)
     verNumLabel.grid(row=0, column=1)
 
     global egramLinkButton 
-    egramLinkButton = tk.Button(egramFrame, width=_BUTTON_WIDTH, text="Link", font=_FONT_DEFAULT, pady=_PAD_Y*2, bg=_LINK_BG, command=link)
+    egramLinkButton = tk.Button(upperEgramFrame, width=_BUTTON_WIDTH, text="Link", font=_FONT_DEFAULT, pady=_PAD_Y*2, bg=_LINK_BG, command=link)
     global egramUnlinkButton
-    egramUnlinkButton = tk.Button(egramFrame, width=_BUTTON_WIDTH, text="Unlink", font=_FONT_DEFAULT, pady=_PAD_Y*2, bg=_UNLINK_BG, command=unlink)
+    egramUnlinkButton = tk.Button(upperEgramFrame, width=_BUTTON_WIDTH, text="Unlink", font=_FONT_DEFAULT, pady=_PAD_Y*2, bg=_UNLINK_BG, command=unlink)
        
     global egramSendDataButton
-    egramSendDataButton = tk.Button(egramFrame, width=_BUTTON_WIDTH*2, text="Send Egram Data", pady=_PAD_Y, font=_FONT_DEFAULT, bg=_BUTTON_BG, command=egramSendData())
+    egramSendDataButton = tk.Button(upperEgramFrame, width=_BUTTON_WIDTH*2, text="Send Egram Data", pady=_PAD_Y, font=_FONT_DEFAULT, bg=_BUTTON_BG, command=egramSendData)
     egramSendDataButton.grid(row=2, columnspan=3, column=0,pady=(_PAD_Y*2,_PAD_Y))
     global egramRecieveDataButton
-    egramRecieveDataButton = tk.Button(egramFrame, width=_BUTTON_WIDTH*3, text="Recieve + Show Egram Data", pady=_PAD_Y, font=_FONT_DEFAULT, bg=_BUTTON_BG, command=egramRecieveData())
+    egramRecieveDataButton = tk.Button(upperEgramFrame, width=_BUTTON_WIDTH*3, text="Recieve + Show Egram Data", pady=_PAD_Y, font=_FONT_DEFAULT, bg=_BUTTON_BG, command=egramRecieveData)
     egramRecieveDataButton.grid(row=3, columnspan=3, column=0,pady=_PAD_Y)
     
     if user_manager.connectToPacemaker()[0]:
@@ -93,4 +96,19 @@ def egramSendData():
     user_manager.sendParameterDataToPacemaker()
 
 def egramRecieveData():
-    return
+    fig, ax = plt.subplots()
+    plotFrame = tk.Frame(egramFrame)
+    plotCanvas = FigureCanvasTkAgg(fig, plotFrame)
+    plotToolbar = NavigationToolbar2Tk(plotCanvas, plotFrame, pack_toolbar=False)
+    plotFrame.grid(row=4,column=0)
+    plotCanvas.get_tk_widget().grid(row=1, column=0, columnspan=3, pady=_PAD_Y)
+    ax.clear()
+    ax.set_title(f"Display from Pacing Mode {user_manager.getPacingMode()}", font=_FONT_DICT_DEFAULT)
+    ax.set_xlabel('Time [s]', font=_FONT_DICT_DEFAULT)
+    ax.set_ylabel('Voltage [mV]', font=_FONT_DICT_DEFAULT)
+    x = np.random.randint(0,100,10)
+    y = np.random.randint(0,100,10)
+    ax.plot(x,y)
+    plotCanvas.draw()
+    plotToolbar.update()
+    plotToolbar.grid(row=2, column=0, sticky="w")

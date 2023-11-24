@@ -41,6 +41,7 @@ def createAndShowWelcome():
     passwordInput.grid(row=5, column=0, padx=_PAD_X, pady=(_PAD_Y,_PAD_Y*4), columnspan=2)
     loginButton.grid(row=6, column=0, padx=_PAD_X, pady=_PAD_Y)
     createUserButton.grid(row=6, column=1, padx=_PAD_X, pady=_PAD_Y)
+    print("here")
 
 def onLogin():
     isSuccessfulLogin, errorMsg = user_manager.loginUser(usernameInput.get(), passwordInput.get())
@@ -55,7 +56,6 @@ def onLogin():
     upperDCMFrame.grid(row=0,column=0)
     middleDCMFrame.grid(row=1,column=0)
     lowerDCMFrame.grid(row=2,column=0)
-
 
     DCM_handler.createAndShowDCM(user_manager.getPacingMode())
 

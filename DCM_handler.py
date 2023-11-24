@@ -17,7 +17,6 @@ _MAX_COL = 4
 _TKFONT_DEFAULT = global_vars._TKFONT_DEFAULT
 _SELECTED_OPTION = global_vars._SELECTED_OPTION
 
-
 root = global_vars.root
 
 welcomeFrame = tk.Frame(root)
@@ -113,7 +112,7 @@ def updateParameters(mode):
 def logout():
     user_manager.logoutUser()
     GUI_helpers.hideFrame(DCMFrame)
-    GUI_helpers.hideFrame(egram_handler.egramFrame)
+    GUI_helpers.hideFrame(global_vars.egramFrame)
     welcome_handler.createAndShowWelcome()
     return
 
