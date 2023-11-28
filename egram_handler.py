@@ -109,6 +109,8 @@ def egramRecieveData():
     x = np.random.randint(0,100,10)
     y = np.random.randint(0,100,10)
     ax.plot(x,y)
+    ax.set_xlim(0, max(x))
+    ax.set_ylim(0, max(y))
     plotCanvas.draw()
     plotToolbar.update()
     plotToolbar.grid(row=2, column=0, sticky="w")

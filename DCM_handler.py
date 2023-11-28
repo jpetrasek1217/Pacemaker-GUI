@@ -4,6 +4,7 @@ import user_manager
 import egram_handler
 import GUI_helpers
 import welcome_handler
+from PIL import ImageTk, Image
 
 _PAD_X = global_vars._PAD_X
 _PAD_Y = global_vars._PAD_Y
@@ -102,13 +103,16 @@ def updateParameters(mode):
     
     _SELECTED_OPTION.set(user_manager.getThresholdTitle())
     threshold_dropdown = tk.OptionMenu(middleDCMFrame, _SELECTED_OPTION, *user_manager.getThresholdTitles())
-    threshold_dropdown.grid(row=_MAX_ROW*2-1, column=_MAX_COL-2, padx=_PAD_X, pady=(_PAD_Y*2,0))
     if user_manager.isThresholdVisible():
-        threshold_dropdown.config(font=_FONT_DEFAULT,  width=_DCM_ENTRY_WIDTH-1, bg=_BUTTON_BG, fg="black")
+        threshold_dropdown.config(font=_FONT_DEFAULT,  width=_DCM_ENTRY_WIDTH-1, bg=_BUTTON_BG, fg="black",indicatoron=1, compound=tk.RIGHT)
     else:
-        threshold_dropdown.config(font=_FONT_DEFAULT,  width=_DCM_ENTRY_WIDTH-1, bg=_BUTTON_BG, fg="black", state="disabled")
+        threshold_dropdown.config(font=_FONT_DEFAULT,  width=_DCM_ENTRY_WIDTH-1, bg=_BUTTON_BG, fg="black", state="disabled", indicatoron=1, compound=tk.RIGHT)
+    threshold_dropdown.grid(row=_MAX_ROW*2-1, column=_MAX_COL-2, padx=_PAD_X, pady=(_PAD_Y*2,0), sticky=tk.EW)
     threshold_label = tk.Label(middleDCMFrame, text="Threshold", font=_FONT_DEFAULT)
-    threshold_label.grid(row=_MAX_ROW*2, column=_MAX_COL-2, padx=_PAD_X, pady=_PAD_Y)
+    threshold_label.grid(row=_MAX_ROW*2, column=_MAX_COL-2, padx=_PAD_X, pady=(0,_PAD_Y))
+
+#=
+
 
 
 def logout():
