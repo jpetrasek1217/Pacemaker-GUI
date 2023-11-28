@@ -49,7 +49,7 @@ def createAndShowDCM(mode):
             currentPacingModeButton += 1
     
     saveButton = tk.Button(global_vars.lowerDCMFrame, text="Save", padx=_PAD_X, pady=_PAD_Y, width=_BUTTON_WIDTH, bg=_BUTTON_BG, font=_FONT_DEFAULT, command=onSaveParameters)
-    sendButton =  tk.Button(global_vars.lowerDCMFrame, text="Send", padx=_PAD_X, pady=_PAD_Y, width=_BUTTON_WIDTH, height=1, bg=_BUTTON_BG, font=_FONT_DEFAULT, command=egram_handler.openEgram)
+    sendButton =  tk.Button(global_vars.lowerDCMFrame, text="Send", padx=_PAD_X, pady=_PAD_Y, width=_BUTTON_WIDTH, height=1, bg=_BUTTON_BG, font=_FONT_DEFAULT, command=sendData)
     institutionLabel = tk.Label(lowerDCMFrame, text="McMaster University", font=_FONT_DEFAULT)
     
     saveButton.grid(row=0, column=4)
@@ -111,15 +111,17 @@ def updateParameters(mode):
     threshold_label = tk.Label(middleDCMFrame, text="Threshold", font=_FONT_DEFAULT)
     threshold_label.grid(row=_MAX_ROW*2, column=_MAX_COL-2, padx=_PAD_X, pady=(0,_PAD_Y))
 
-#=
 
+def sendData():
+    if onSaveParameters():
+        egram_handler.openEgram()
 
 
 def logout():
-    user_manager.logoutUser()
-    GUI_helpers.hideFrame(DCMFrame)
-    GUI_helpers.hideFrame(global_vars.egramFrame)
-    welcome_handler.createAndShowWelcome()
+    if user_manager.logoutUser()[0]:
+        GUI_helpers.hideFrame(DCMFrame)
+        GUI_helpers.hideFrame(global_vars.egramFrame)
+        welcome_handler.createAndShowWelcome()
     return
 
 def onSaveParameters():
@@ -129,7 +131,8 @@ def onSaveParameters():
         isSuccessfulSave, errorMsg = user_manager.saveParameterValue(paramName, paramEntry.get())
         if not isSuccessfulSave:
             GUI_helpers.throwErrorPopup(errorMsg)
-            return
+            return False
     user_manager.setThresholdValueFromTitle(_SELECTED_OPTION.get())
     updateParameters(user_manager.getPacingMode())
     GUI_helpers.throwSuccessPopup("Successfully saved all parameters.")
+    return True

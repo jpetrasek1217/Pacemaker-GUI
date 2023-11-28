@@ -29,7 +29,6 @@ egramFrame = global_vars.egramFrame
 plotFrame = global_vars.plotFrame
 
 def openEgram():
-    DCM_handler.onSaveParameters()
     GUI_helpers.hideFrame(DCMFrame)
     egramFrame.grid(row=0, column=0, pady=25, padx=25, sticky="nsew")
     upperEgramFrame = tk.Frame(egramFrame)
@@ -49,10 +48,10 @@ def openEgram():
     egramUnlinkButton = tk.Button(upperEgramFrame, width=_BUTTON_WIDTH, text="Unlink", font=_FONT_DEFAULT, pady=_PAD_Y*2, bg=_UNLINK_BG, command=unlink)
        
     global egramSendDataButton
-    egramSendDataButton = tk.Button(upperEgramFrame, width=_BUTTON_WIDTH*2, text="Send Egram Data", pady=_PAD_Y, font=_FONT_DEFAULT, bg=_BUTTON_BG, command=egramSendData)
+    egramSendDataButton = tk.Button(upperEgramFrame, width=_BUTTON_WIDTH*2, text="Send Parameter Data", pady=_PAD_Y, font=_FONT_DEFAULT, bg=_BUTTON_BG, command=egramSendData)
     egramSendDataButton.grid(row=2, columnspan=3, column=0,pady=(_PAD_Y*2,_PAD_Y))
     global egramRecieveDataButton
-    egramRecieveDataButton = tk.Button(upperEgramFrame, width=_BUTTON_WIDTH*3, text="Recieve + Show Egram Data", pady=_PAD_Y, font=_FONT_DEFAULT, bg=_BUTTON_BG, command=egramRecieveData)
+    egramRecieveDataButton = tk.Button(upperEgramFrame, width=_BUTTON_WIDTH*3, text="Recieve + Show E-gram Data", pady=_PAD_Y, font=_FONT_DEFAULT, bg=_BUTTON_BG, command=egramRecieveData)
     egramRecieveDataButton.grid(row=3, columnspan=3, column=0,pady=_PAD_Y)
     
     if user_manager.connectToPacemaker()[0]:
@@ -117,3 +116,4 @@ def egramRecieveData():
     plotToolbar.update()
     plotToolbar.grid(row=2, column=0, sticky="w")
     plt.close(fig)
+
