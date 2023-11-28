@@ -33,6 +33,7 @@ middleDCMFrame = tk.Frame(DCMFrame)
 upperDCMFrame = tk.Frame(DCMFrame)
 
 egramFrame = tk.Frame(root)
+plotFrame = tk.Frame(egramFrame)
 
 # parameterEntryAndLabelList is made up of sublists: [paramName: str, paramEntry: tk.Entry, paramLabel: tk.Label]
 parameterEntryAndLabelList = []

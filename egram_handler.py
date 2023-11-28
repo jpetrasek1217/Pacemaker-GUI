@@ -26,6 +26,7 @@ lowerDCMFrame = global_vars.lowerDCMFrame
 middleDCMFrame = global_vars.middleDCMFrame
 upperDCMFrame = global_vars.upperDCMFrame
 egramFrame = global_vars.egramFrame
+plotFrame = global_vars.plotFrame
 
 def openEgram():
     DCM_handler.onSaveParameters()
@@ -97,12 +98,13 @@ def egramSendData():
 
 def egramRecieveData():
     fig, ax = plt.subplots()
-    plotFrame = tk.Frame(egramFrame)
+
     plotCanvas = FigureCanvasTkAgg(fig, plotFrame)
     plotToolbar = NavigationToolbar2Tk(plotCanvas, plotFrame, pack_toolbar=False)
+    ax.clear()
+    
     plotFrame.grid(row=4,column=0)
     plotCanvas.get_tk_widget().grid(row=1, column=0, columnspan=3, pady=_PAD_Y)
-    ax.clear()
     ax.set_title(f"Display from Pacing Mode {user_manager.getPacingMode()}", font=_FONT_DICT_DEFAULT)
     ax.set_xlabel('Time [s]', font=_FONT_DICT_DEFAULT)
     ax.set_ylabel('Voltage [mV]', font=_FONT_DICT_DEFAULT)
