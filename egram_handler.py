@@ -102,7 +102,7 @@ def egramRecieveData():
     plotCanvas = FigureCanvasTkAgg(fig, plotFrame)
     plotToolbar = NavigationToolbar2Tk(plotCanvas, plotFrame, pack_toolbar=False)
     ax.clear()
-    
+
     plotFrame.grid(row=4,column=0)
     plotCanvas.get_tk_widget().grid(row=1, column=0, columnspan=3, pady=_PAD_Y)
     ax.set_title(f"Display from Pacing Mode {user_manager.getPacingMode()}", font=_FONT_DICT_DEFAULT)
@@ -116,3 +116,4 @@ def egramRecieveData():
     plotCanvas.draw()
     plotToolbar.update()
     plotToolbar.grid(row=2, column=0, sticky="w")
+    plt.close(fig)
