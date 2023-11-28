@@ -6,12 +6,12 @@ class Parameters(Enum):
     UPPER_RATE_LIMIT = "Upper Rate\nLimit", "ppm", 120, 50, 175, 0
     ATRIAL_AMPLITUDE = "Atrial\nAmplitude", "V", 5.0, 0.1, 5.0, 1
     ATRIAL_PULSE_WIDTH = "Atrial\nPulse Width", "ms", 1.0, 1.0, 30.0, 1
-    ATRIAL_SENSITIVITY = "Atrial\nSensitivity", "mV", 1.0, 0.0, 5.0, 1
     ATRIAL_REFACTORY_PERIOD = "Atrial\nRefractory Period", "ms", 250, 150, 500, -1
+    ATRIAL_SENSITIVITY = "Atrial\nSensitivity", "mV", 1.0, 0.0, 5.0, 1
     VENTRICULAR_AMPLITUDE = "Ventricular\nAmplitude", "V", 5.0, 0.1, 5.0, 1
     VENTRICULAR_PULSE_WIDTH = "Ventricular\nPulse Width", "ms", 1.0, 1.0, 30.0, 1
-    VENTRICULAR_SENSITIVITY = "Ventricular\nSensitivity", "mV", 3.5, 0.0, 5.0, 1
     VENTRICULAR_REFACTORY_PERIOD = "Ventricular\nRefractory Period", "ms", 320, 150, 500, -1
+    VENTRICULAR_SENSITIVITY = "Ventricular\nSensitivity", "mV", 3.5, 0.0, 5.0, 1
     MAX_SENSOR_RATE = "Max Sensor\nRate", "ppm", 120, 50, 175, 0
     REACTION_TIME = "Reaction\nTime", "sec", 30, 10, 50, -1
     RESPONSE_FACTOR = "Response\nFactor", "", 8, 1, 16, 0
@@ -73,7 +73,7 @@ class Parameters(Enum):
         return self._upperLimit
 
 
-    def getDecimalPlaces(self) -> float:
+    def getDecimalPlaces(self) -> int:
         '''Returns the Parameter's number of decimal places, used for rounding.'''
         return self._decimalPlaces
     

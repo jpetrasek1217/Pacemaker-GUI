@@ -64,7 +64,7 @@ class User:
         keyExists = isinstance(self._params.get(key), float)    # Check if key exists in user's parameters
         valueIsFloat = isinstance(value, float)
         if keyExists and valueIsFloat:
-            self._params[key] = value
+            self._params[key] = float(value)
         elif keyExists and not valueIsFloat:
             raise ValueError(f"Function user.setParameterValue(key, value) expected float, recieved \'{value}\'")
         else:

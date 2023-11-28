@@ -249,20 +249,33 @@ def connectToPacemaker() -> tuple[bool, str]:
     
 
 def disconnectFromPacemaker() -> tuple[bool, str]:
-    serial_comms.disconnectToPacemaker()
+    serial_comms.disconnectFromPacemaker()
     return True, ""
 
 
 def sendParameterDataToPacemaker() -> tuple[bool, str]:
-    #if not serial_comms.isPacemakerConnected():
-    #    return False, "Unable to find Pacemaker, please verify the Pacemaker is connected and press 'Link\'."
-    
-    serial_comms.sendParameterDataToPacemaker(_activeUser.getAllParameterValues(),
+    if not serial_comms.isPacemakerConnected():
+        return False, "Unable to find Pacemaker, please verify the Pacemaker is connected and press 'Link\'."
+
+    if serial_comms.sendParameterDataToPacemaker(_activeUser.getAllParameterValues(),
                                               _activeUser.getPacingMode(),
                                               _activeUser.getThreshold()
-                                             )
+                                             ):
+        return True, ""
+    else:
+        return False, "Did not receive success message, please try to send the data again."
+
+
+def getEgramDataFromPacemaker() -> tuple[list[float], list[float], list[float]]:
+    atrialList, ventricalList = serial_comms.receiveEgramDataFromPacemaker()
+    timeList = range(0, len(atrialList))
+    return timeList, atrialList, ventricalList
+    # if PacingModes[_activeUser.getPacingMode()].isAtrialPacingType():
+    #     return timeList, atrialList
+    # elif PacingModes[_activeUser.getPacingMode()].isVentricularPacingType():
+    #     return timeList, ventricalList
     
-# TODO: TESTING
-# _activeUser = _users[0]
-# connectToPacemaker()
-# sendParameterDataToPacemaker()
+# TODO: TESITNG
+#_activeUser = _users[0]
+#connectToPacemaker()
+#sendParameterDataToPacemaker()

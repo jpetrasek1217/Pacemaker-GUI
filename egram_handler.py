@@ -93,7 +93,12 @@ def openDCM():
     lowerDCMFrame.grid(row=2,column=0)
 
 def egramSendData():
-    user_manager.sendParameterDataToPacemaker()
+    isSuccessfullLink, errorMsg = user_manager.sendParameterDataToPacemaker()
+    if isSuccessfullLink:
+        GUI_helpers.throwSuccessPopup("Successfully sent parameter data!")
+    else:
+         GUI_helpers.throwErrorPopup(errorMsg)
+    
 
 def egramRecieveData():
     fig, ax = plt.subplots()
@@ -105,13 +110,13 @@ def egramRecieveData():
     plotFrame.grid(row=4,column=0)
     plotCanvas.get_tk_widget().grid(row=1, column=0, columnspan=3, pady=_PAD_Y)
     ax.set_title(f"Display from Pacing Mode {user_manager.getPacingMode()}", font=_FONT_DICT_DEFAULT)
-    ax.set_xlabel('Time [s]', font=_FONT_DICT_DEFAULT)
+    ax.set_xlabel('Time [ms]', font=_FONT_DICT_DEFAULT)
     ax.set_ylabel('Voltage [mV]', font=_FONT_DICT_DEFAULT)
-    x = np.random.randint(0,100,10)
-    y = np.random.randint(0,100,10)
-    ax.plot(x,y)
-    ax.set_xlim(0, max(x))
-    ax.set_ylim(0, max(y))
+    time, atrial, ventricular = user_manager.getEgramDataFromPacemaker()
+    ax.plot(time,atrial)
+    ax.plot(time, ventricular)
+    ax.set_xlim(min(time), max(time))
+    ax.set_ylim(min(min(atrial), min(ventricular)), max(max(atrial), max(ventricular)))
     plotCanvas.draw()
     plotToolbar.update()
     plotToolbar.grid(row=2, column=0, sticky="w")

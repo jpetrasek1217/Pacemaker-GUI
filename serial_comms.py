@@ -17,14 +17,17 @@ _SER_TIMEOUT = 1
 _SER_WRITE_TIMEOUT = 0
 
 _PACEMAKER_COMM_PORT_DESCP = "JLink CDC UART Port"
-_pacemakerCommPort = ''
+_pacemakerCommPort = '' # Active Comm Port that the pacemaker is connected to
 
-_BYTE_SYNC = 22
-_BYTE_PARAMS_FNCODE = 85 # 'U' ASCII
+_SYNC_CODE = 22
+_PARAMS_FNCODE = 85 # 'U' ASCII
+_PARAMS_SUCCESS_CODE = 76
+_EGRAM_FNCODE = 34
 
-_ENDIANNESS = '<' # Little Endian
-_DATATYPE = 'd' # Double
-_BYTE_FORMAT = _ENDIANNESS + _DATATYPE
+_STRUCT_ENDIANNESS = '<' # Little Endian
+_STRUCT_DATATYPE_CHAR = 'd' # Double
+_STRUCT_BYTESIZE_DATATYPE = 8 # Double is 8 bytes
+_STRUCT_FORMAT_STR = _STRUCT_ENDIANNESS + _STRUCT_DATATYPE_CHAR
 
 # THIS ORDER CANNOT CHANGE -- AGREED COMMS BETWEEN PACEMAKER AND DCM
 _paramDataToSend = [
@@ -47,38 +50,41 @@ _paramDataToSend = [
 
 # --- Send & Receive Data ---
 
-def sendParameterDataToPacemaker(params: dict[str, float], pacingMode: str | PacingModes, threshold: float):
+def sendParameterDataToPacemaker(params: dict[str, float], pacingMode: str | PacingModes, threshold: float) -> bool:
     # Byte Array of all Parameter Data - Reference docs for order of data
-    byteArray = bytearray(struct.pack(_BYTE_FORMAT, _BYTE_SYNC))
-    byteArray.extend(bytearray(struct.pack(_BYTE_FORMAT, _BYTE_PARAMS_FNCODE)))
-    byteArray.extend(bytearray(struct.pack(_BYTE_FORMAT, _getPacingModeByte(pacingMode))))
+    byteArrayToWrite = bytearray(struct.pack(_STRUCT_FORMAT_STR, _SYNC_CODE))
+    byteArrayToWrite.extend(bytearray(struct.pack(_STRUCT_FORMAT_STR, _PARAMS_FNCODE)))
+    byteArrayToWrite.extend(bytearray(struct.pack(_STRUCT_FORMAT_STR, _getPacingModeByte(pacingMode))))
 
     for param in _paramDataToSend:
         if param in params:
-            byteArray.extend((bytearray(struct.pack(_BYTE_FORMAT, params[param]))))
+            byteArrayToWrite.extend((bytearray(struct.pack(_STRUCT_FORMAT_STR, params[param]))))
         else:
             raise KeyError(f"Unrecognized parameter \'{param}\' in serial communication stream when writing data.")
 
-    byteArray.extend(bytearray(struct.pack(_BYTE_FORMAT, threshold)))
+    byteArrayToWrite.extend(bytearray(struct.pack(_STRUCT_FORMAT_STR, threshold)))
+    byteArrayToWrite.extend(bytearray(struct.pack(_STRUCT_FORMAT_STR, _calculateChecksum(byteArrayToWrite))))
+    
+    # Send Param Data
+    print(f"BYTE DATA: {_unpackByteArray(byteArrayToWrite)}, BYTE SIZE OF PACKET: {len(byteArrayToWrite)}")
+    _writeSerialData(byteArrayToWrite)
 
-    # Checksum - The sum of all the bytes including checksum should equal 0xFF, so checksum = ~(sum of all other bytes)
-    checksum = ~(numpy.uint64(sum(byteArray)))
-    byteArray.extend(bytearray(struct.pack('<Q', checksum)))
-    print(f"BYTESUM: {~checksum}, CHECKSUM: {checksum}, COMBINED: {sum(byteArray)}")
-    print(f"BYTESUM: {bin(~checksum)}, CHECKSUM: {bin(checksum)}, COMBINED: {bin(sum(byteArray))}")
-
-    print(f"BYTE DATA: {byteArray}, SIZE OF PACKET: {len(byteArray)}")
-    print(receiveParameterDataFromPacemaker(byteArray))
-    _writeSerialData(byteArray)
-
-
-def receiveParameterDataFromPacemaker(byteArray: bytearray):
-    unpackStr = _ENDIANNESS + _DATATYPE*(len(_paramDataToSend) + 4) + 'Q'
-    return struct.unpack(unpackStr, byteArray)
+    # Read Success Message
+    successCode = _unpackByteArray(_readSerialData())
+    print(f"SUCCESS CODE: {successCode}")
+    return successCode == _PARAMS_SUCCESS_CODE
 
 
-def receiveEgramDataFromPacemaker():
-    pass
+def receiveEgramDataFromPacemaker() -> tuple[list[float], list[float]]:
+    # Send Egram Request Code
+    byteArrayToWrite = bytearray(struct.pack(_STRUCT_FORMAT_STR, _SYNC_CODE))
+    byteArrayToWrite.extend(bytearray(struct.pack(_STRUCT_FORMAT_STR, _EGRAM_FNCODE)))
+    print(f"BYTE DATA: {_unpackByteArray(byteArrayToWrite)}, BYTE SIZE OF PACKET: {len(byteArrayToWrite)}")
+    _writeSerialData(byteArrayToWrite)
+
+    # Read Egram Data
+    egramDataTuple = _unpackByteArray(_readSerialData())
+    return egramDataTuple, egramDataTuple
 
 
 # --- Read & Write ---
@@ -100,6 +106,7 @@ def _writeSerialData(byteArray: bytearray):
         #ser.reset_input_buffer()   #TODO: remove if not needed
         #ser.reset_output_buffer()
         #sleep(1)
+        print(f"WRITING...")
         ser.write(byteArray)
 
 
@@ -127,24 +134,47 @@ def _readSerialData() -> bytearray:
 
 def _getPacingModeByte(pacingMode: str | PacingModes) -> bytes:
     if pacingMode == PacingModes.AOO.getName():
-        return 0x00
-    elif pacingMode == PacingModes.AAI.getName():
-        return 0x01
-    elif pacingMode == PacingModes.AOOR.getName():
-        return 0x02
-    elif pacingMode == PacingModes.AAIR.getName():
-        return 0x03
+        return 0
     elif pacingMode == PacingModes.VOO.getName():
-        return 0x04
+        return 1
+    elif pacingMode == PacingModes.AAI.getName():
+        return 2
     elif pacingMode == PacingModes.VVI.getName():
-        return 0x05
+        return 3
+    elif pacingMode == PacingModes.AOOR.getName():
+        return 4
     elif pacingMode == PacingModes.VOOR.getName():
-        return 0x06
+        return 5
+    elif pacingMode == PacingModes.AAIR.getName():
+        return 6
     elif pacingMode == PacingModes.VVIR.getName():
-        return 0x07
+        return 7
     else:
         raise ValueError("Given parameter is not a Pacing Mode.")
 
+
+def _calculateChecksum(byteArray: bytearray) -> int:
+    # Checksum - Linear Combo of all data with coeffs of the index in the array (one-indexed)
+    unpackStr = _STRUCT_ENDIANNESS + _STRUCT_DATATYPE_CHAR * (len(byteArray) // _STRUCT_BYTESIZE_DATATYPE)
+    floatArray = struct.unpack(unpackStr, byteArray)
+
+    checksum = numpy.double(0.0)
+    for i in range(len(floatArray)):
+        checksum += numpy.double(floatArray[i] * (i + 1))
+    
+    print(f"CHECKSUM: {checksum}")
+    return checksum
+
+def _packByteArray(data: any, *byteArray: bytearray):
+    if byteArray:
+        return byteArray.extend(bytearray(struct.pack(_STRUCT_FORMAT_STR, data)))
+    else:
+        return bytearray(struct.pack(_STRUCT_FORMAT_STR, data))
+
+
+def _unpackByteArray(byteArray: bytearray):
+    unpackStr = _STRUCT_ENDIANNESS + _STRUCT_DATATYPE_CHAR * (len(byteArray) // _STRUCT_BYTESIZE_DATATYPE)
+    return struct.unpack(unpackStr, byteArray)
 
 # --- Pacemaker Connection Status ---
 
