@@ -9,25 +9,25 @@ from pacemaker_pacingmodes import PacingModes
 
 # --- Constants ---
 
-_SER_BAUDRATE = 115200
+_SER_BAUDRATE = 115200                  # units of bits/sec
 _SER_BYTESIZE = serial.EIGHTBITS
 _SER_PARTITY = serial.PARITY_NONE
 _SER_STOPBITS = serial.STOPBITS_ONE
-_SER_TIMEOUT = 5
-_SER_WRITE_TIMEOUT = 0
-_SER_MAX_READ_BYTE_LEN = 32000
+_SER_TIMEOUT = 5                        # units of seconds
+_SER_WRITE_TIMEOUT = 0                  # units of seconds
+_SER_MAX_READ_BYTE_LEN = 32000          # units of bytes
 
 _PACEMAKER_COMM_PORT_DESCP = "JLink CDC UART Port"
-_pacemakerCommPort = '' # Active Comm Port that the pacemaker is connected to
+_pacemakerCommPort = ''                 # Active Comm Port that the pacemaker is connected to
 
 _SYNC_CODE = 22
-_PARAMS_FNCODE = 85 # 'U' ASCII
+_PARAMS_FNCODE = 85
 _PARAMS_SUCCESS_CODE = 76
 _EGRAM_FNCODE = 34
 
-_STRUCT_ENDIANNESS_CHAR = '<' # Little Endian
-_STRUCT_DATATYPE_CHAR = 'd' # Double
-_STRUCT_BYTESIZE_OF_DATATYPE = 8 # Double is 8 bytes
+_STRUCT_ENDIANNESS_CHAR = '<'           # Little Endian
+_STRUCT_DATATYPE_CHAR = 'd'             # Double
+_STRUCT_BYTESIZE_OF_DATATYPE = 8        # Double is 8 bytes
 _STRUCT_FORMAT_STR = _STRUCT_ENDIANNESS_CHAR + _STRUCT_DATATYPE_CHAR
 
 # THIS ORDER CANNOT CHANGE -- AGREED COMMS BETWEEN PACEMAKER AND DCM
@@ -47,13 +47,13 @@ _PARAMS_NAMES_ORDERED_LIST = [
     Parameters.RESPONSE_FACTOR.getName(),
     Parameters.RECOVERY_TIME.getName(),
 ]
-_PACKET_BYTESIZE = (len(_PARAMS_NAMES_ORDERED_LIST) + 5) * _STRUCT_BYTESIZE_OF_DATATYPE     # plus 5 from: SYNC, FNCODE, PACINGMODE, THRESHOLD, CHECKSUM
+_PACKET_BYTESIZE = (len(_PARAMS_NAMES_ORDERED_LIST) + 5) * _STRUCT_BYTESIZE_OF_DATATYPE    # plus 5 from: SYNC, FNCODE, PACINGMODE, THRESHOLD, CHECKSUM
 
 
 # --- Send & Receive Data ---
 
 def sendParameterDataToPacemaker(params: dict[str, float], pacingMode: str | PacingModes, threshold: float) -> bool:
-    # Byte Array of all Parameter Data - Reference docs for order of data
+    # Construct byte array - Reference Docs for structure and order of data
     byteArrayToWrite = bytearray(struct.pack(_STRUCT_FORMAT_STR, _SYNC_CODE))
     byteArrayToWrite.extend(bytearray(struct.pack(_STRUCT_FORMAT_STR, _PARAMS_FNCODE)))
     byteArrayToWrite.extend(bytearray(struct.pack(_STRUCT_FORMAT_STR, _getPacingModeByte(pacingMode))))
@@ -72,19 +72,28 @@ def sendParameterDataToPacemaker(params: dict[str, float], pacingMode: str | Pac
 
     # Read Success Message
     successCode = _unpackByteArray(_readSerialData())
+    try:
+        successCode = int(successCode)
+    except TypeError:
+        try:
+            successCode = successCode[0]
+        except:
+            return False
     return successCode == _PARAMS_SUCCESS_CODE
 
 
 def receiveEgramDataFromPacemaker() -> tuple[list[float], list[float]]:
-    # Send Egram Request Code
+    # Construct byte array - Reference Docs for structure and order of data
     byteArrayToWrite = bytearray(struct.pack(_STRUCT_FORMAT_STR, _SYNC_CODE))
     byteArrayToWrite.extend(bytearray(struct.pack(_STRUCT_FORMAT_STR, _EGRAM_FNCODE)))
-        
+    
+	# Send Egram Request Code
     _writeSerialData(byteArrayToWrite)
 
     # Read Egram Data
     egramDataTuple = _unpackByteArray(_readSerialData())
-    return egramDataTuple, egramDataTuple
+    midpoint = len(egramDataTuple) // 2
+    return egramDataTuple[0:midpoint - 1], egramDataTuple[midpoint: len(egramDataTuple) - 1]
 
 
 # --- Read & Write ---
@@ -133,6 +142,7 @@ def _readSerialData() -> bytearray:
                       ) as ser:  
         print(f"READING...")
         byteArray = ser.read(_SER_MAX_READ_BYTE_LEN)
+        print(f"SIZE OF READ: {len(byteArray)}")
         print(f"READ: {_unpackByteArray(byteArray)}")
     return byteArray
 
@@ -162,9 +172,7 @@ def _getPacingModeByte(pacingMode: str | PacingModes) -> bytes:
 
 def _calculateChecksum(byteArray: bytearray) -> int:
     # Checksum - Linear Combo of all data with coeffs of the index in the array (one-indexed)
-    unpackStr = _STRUCT_ENDIANNESS_CHAR + _STRUCT_DATATYPE_CHAR * (len(byteArray) // _STRUCT_BYTESIZE_OF_DATATYPE)
-    floatArray = struct.unpack(unpackStr, byteArray)
-
+    floatArray = _unpackByteArray(byteArray)
     checksum = numpy.double(0.0)
     for i in range(len(floatArray)):
         checksum += numpy.double(floatArray[i] * (i + 1))
@@ -194,4 +202,16 @@ def disconnectFromPacemaker() -> None:
 
 
 def isPacemakerConnected() -> bool:
-    return _pacemakerCommPort in list(port.name for port in port_list.comports())
+    return _pacemakerCommPort in list(port.name for port in port_list.comports()) and onlyOnePacemakerConnected()
+
+
+def onlyOnePacemakerConnected() -> bool:
+    amountOfPacemakersDetected = 0
+    portDict = {port.description: port.name for port in port_list.comports()}
+    for descp in portDict.keys():
+        if descp.startswith(_PACEMAKER_COMM_PORT_DESCP):
+            amountOfPacemakersDetected += 1
+    if amountOfPacemakersDetected == 1:
+        return True
+    else:
+        return False

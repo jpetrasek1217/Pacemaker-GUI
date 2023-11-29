@@ -9,7 +9,8 @@ from user import User
 
 _MAX_USERS_SAVED = int(10)
 _REGEX_VALID_CHARS = "^[a-zA-Z0-9]*$"
-_PACEMAKER_CONNECTION_REFRESH_INTERVAL = 1000 # units of ms #TODO: Implement Pacemaker Connection Interval
+
+PACEMAKER_CONNECTION_REFRESH_INTERVAL = 1000 # units of ms #TODO: Implement Pacemaker Connection Interval
 
 
 # --- Init ---

@@ -66,7 +66,7 @@ def link():
     if isSuccessfullLink:
         egramLinkButton.grid_forget()
         egramUnlinkButton.grid(row=0, rowspan=2, column=2)
-        GUI_helpers.throwSuccessPopup("Successfully Connected!")
+        GUI_helpers.throwSuccessPopup("Pacemaker Successfully Connected!")
         egramSendDataButton.config(state="normal")
         egramRecieveDataButton.config(state="normal")
     else:
@@ -80,7 +80,7 @@ def unlink():
         egramLinkButton.grid(row=0, rowspan=2, column=2)
         egramSendDataButton.config(state="disabled")
         egramRecieveDataButton.config(state="disabled")
-        GUI_helpers.throwSuccessPopup("Successfully Disconnected!")
+        GUI_helpers.throwSuccessPopup("Pacemaker Disconnected.")
     else:
          GUI_helpers.throwErrorPopup(errorMsg)
 
@@ -118,11 +118,25 @@ def egramRecieveData():
         return # Break if not enough data
     ax.plot(time,atrial)
     ax.plot(time, ventricular)
-    ax.set_xlim(min(time), max(time))
-    ax.set_ylim(min(min(atrial), min(ventricular)), max(max(atrial), max(ventricular)))
+    ax.set_xlim(0, max(time))
+    ax.set_ylim(-1, 1)
 
     plotCanvas.draw()
     plotToolbar.update()
     plotToolbar.grid(row=2, column=0, sticky="w")
     plt.close(fig)
 
+
+# --- Auto detection of pacemaker being disconnected --- 
+
+isPacemakerConnectedPreviousState = False
+
+def refreshPacemakerConnection() -> None:
+    global isPacemakerConnectedPreviousState
+    isPacemakerConnectedCurrentState = user_manager.isPacemakerConnected()
+    if isPacemakerConnectedPreviousState and not isPacemakerConnectedCurrentState:
+        unlink()
+    isPacemakerConnectedPreviousState = isPacemakerConnectedCurrentState
+    global_vars.root.after(user_manager.PACEMAKER_CONNECTION_REFRESH_INTERVAL, refreshPacemakerConnection)
+
+refreshPacemakerConnection()
