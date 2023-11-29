@@ -10,9 +10,13 @@ McMaster University
 With a terminal open in the directory, run the `GUI.py` file using any of the options below:
 
 ```bash
-.'\GUI.py
+.\GUI.py
+```
 
-py .'\GUI.py
+```bash
+py .\GUI.py
+```
 
-python3 .'\GUI.py
+```bash
+python3 .\GUI.py
 ```
