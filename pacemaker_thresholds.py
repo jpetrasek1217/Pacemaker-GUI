@@ -1,13 +1,13 @@
 from enum import Enum
 
 class Thresholds(Enum):
-    VERY_LOW = 'Very Low', 0.0
-    LOW = 'Low', 1.0
-    MED_LOW = 'Medium Low', 2.0
-    MED = 'Medium', 3.0
-    MED_HIGH = 'Medium High', 4.0
-    HIGH = 'High', 5.0
-    VERY_HIGH = 'Very High', 6.0
+    VERY_LOW = 'Very Low', 0.05
+    LOW = 'Low', 1.15
+    MED_LOW = 'Medium Low', 2.25
+    MED = 'Medium', 3.35
+    MED_HIGH = 'Medium High', 4.45
+    HIGH = 'High', 5.55
+    VERY_HIGH = 'Very High', 6.65
 
 
     def __init__(self, title: str, value: float) -> None:

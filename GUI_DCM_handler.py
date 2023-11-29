@@ -1,9 +1,9 @@
 import tkinter as tk
-import global_vars
+import GUI_global_vars as global_vars
 import user_manager
-import egram_handler
+import GUI_egram_handler as egram_handler
 import GUI_helpers
-import welcome_handler
+import GUI_welcome_handler as welcome_handler
 from PIL import ImageTk, Image
 
 _PAD_X = global_vars._PAD_X

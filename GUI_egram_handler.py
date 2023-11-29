@@ -1,7 +1,7 @@
 import tkinter as tk
-import global_vars
+import GUI_global_vars as global_vars
 import GUI_helpers
-import DCM_handler
+import GUI_DCM_handler as DCM_handler
 import user_manager
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
@@ -54,7 +54,7 @@ def openEgram():
     egramRecieveDataButton = tk.Button(upperEgramFrame, width=_BUTTON_WIDTH*3, text="Recieve + Show E-gram Data", pady=_PAD_Y, font=_FONT_DEFAULT, bg=_BUTTON_BG, command=egramRecieveData)
     egramRecieveDataButton.grid(row=3, columnspan=3, column=0,pady=_PAD_Y)
     
-    if user_manager.connectToPacemaker()[0]:
+    if user_manager.isPacemakerConnected():
         egramUnlinkButton.grid(row=0, rowspan=2, column=2)
     else:
         egramLinkButton.grid(row=0, rowspan=2, column=2)
@@ -112,11 +112,15 @@ def egramRecieveData():
     ax.set_title(f"Display from Pacing Mode {user_manager.getPacingMode()}", font=_FONT_DICT_DEFAULT)
     ax.set_xlabel('Time [ms]', font=_FONT_DICT_DEFAULT)
     ax.set_ylabel('Voltage [mV]', font=_FONT_DICT_DEFAULT)
+
     time, atrial, ventricular = user_manager.getEgramDataFromPacemaker()
+    if len(time) <= 1 or len(atrial) <= 1 or len(ventricular) <= 1:
+        return # Break if not enough data
     ax.plot(time,atrial)
     ax.plot(time, ventricular)
     ax.set_xlim(min(time), max(time))
     ax.set_ylim(min(min(atrial), min(ventricular)), max(max(atrial), max(ventricular)))
+
     plotCanvas.draw()
     plotToolbar.update()
     plotToolbar.grid(row=2, column=0, sticky="w")

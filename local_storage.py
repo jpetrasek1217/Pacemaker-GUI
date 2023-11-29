@@ -17,8 +17,8 @@ def readUsersFromFile() -> list[User]:
         passwordStr = userDict[_PASSWORD_KEY]
         pacingModeStr = userDict[_PACINGMODE_KEY]
         parametersDict = userDict[_PARAMS_KEY]
-        thresholdFloat = userDict[_THRES_KEY]
-        user = User(usernameStr, passwordStr, pacingModeStr, parametersDict, thresholdFloat)
+        thresholdStr = userDict[_THRES_KEY]
+        user = User(usernameStr, passwordStr, pacingModeStr, parametersDict, thresholdStr)
         users.append(user)
     return users
 

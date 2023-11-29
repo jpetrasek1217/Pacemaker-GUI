@@ -13,8 +13,9 @@ _SER_BAUDRATE = 115200
 _SER_BYTESIZE = serial.EIGHTBITS
 _SER_PARTITY = serial.PARITY_NONE
 _SER_STOPBITS = serial.STOPBITS_ONE
-_SER_TIMEOUT = 1
+_SER_TIMEOUT = 5
 _SER_WRITE_TIMEOUT = 0
+_SER_MAX_READ_BYTE_LEN = 32000
 
 _PACEMAKER_COMM_PORT_DESCP = "JLink CDC UART Port"
 _pacemakerCommPort = '' # Active Comm Port that the pacemaker is connected to
@@ -24,13 +25,13 @@ _PARAMS_FNCODE = 85 # 'U' ASCII
 _PARAMS_SUCCESS_CODE = 76
 _EGRAM_FNCODE = 34
 
-_STRUCT_ENDIANNESS = '<' # Little Endian
+_STRUCT_ENDIANNESS_CHAR = '<' # Little Endian
 _STRUCT_DATATYPE_CHAR = 'd' # Double
-_STRUCT_BYTESIZE_DATATYPE = 8 # Double is 8 bytes
-_STRUCT_FORMAT_STR = _STRUCT_ENDIANNESS + _STRUCT_DATATYPE_CHAR
+_STRUCT_BYTESIZE_OF_DATATYPE = 8 # Double is 8 bytes
+_STRUCT_FORMAT_STR = _STRUCT_ENDIANNESS_CHAR + _STRUCT_DATATYPE_CHAR
 
 # THIS ORDER CANNOT CHANGE -- AGREED COMMS BETWEEN PACEMAKER AND DCM
-_paramDataToSend = [
+_PARAMS_NAMES_ORDERED_LIST = [
     Parameters.LOWER_RATE_LIMIT.getName(),
     Parameters.UPPER_RATE_LIMIT.getName(),
     Parameters.ATRIAL_AMPLITUDE.getName(),
@@ -46,6 +47,7 @@ _paramDataToSend = [
     Parameters.RESPONSE_FACTOR.getName(),
     Parameters.RECOVERY_TIME.getName(),
 ]
+_PACKET_BYTESIZE = (len(_PARAMS_NAMES_ORDERED_LIST) + 5) * _STRUCT_BYTESIZE_OF_DATATYPE     # plus 5 from: SYNC, FNCODE, PACINGMODE, THRESHOLD, CHECKSUM
 
 
 # --- Send & Receive Data ---
@@ -56,7 +58,7 @@ def sendParameterDataToPacemaker(params: dict[str, float], pacingMode: str | Pac
     byteArrayToWrite.extend(bytearray(struct.pack(_STRUCT_FORMAT_STR, _PARAMS_FNCODE)))
     byteArrayToWrite.extend(bytearray(struct.pack(_STRUCT_FORMAT_STR, _getPacingModeByte(pacingMode))))
 
-    for param in _paramDataToSend:
+    for param in _PARAMS_NAMES_ORDERED_LIST:
         if param in params:
             byteArrayToWrite.extend((bytearray(struct.pack(_STRUCT_FORMAT_STR, params[param]))))
         else:
@@ -66,12 +68,10 @@ def sendParameterDataToPacemaker(params: dict[str, float], pacingMode: str | Pac
     byteArrayToWrite.extend(bytearray(struct.pack(_STRUCT_FORMAT_STR, _calculateChecksum(byteArrayToWrite))))
     
     # Send Param Data
-    print(f"BYTE DATA: {_unpackByteArray(byteArrayToWrite)}, BYTE SIZE OF PACKET: {len(byteArrayToWrite)}")
     _writeSerialData(byteArrayToWrite)
 
     # Read Success Message
     successCode = _unpackByteArray(_readSerialData())
-    print(f"SUCCESS CODE: {successCode}")
     return successCode == _PARAMS_SUCCESS_CODE
 
 
@@ -79,7 +79,7 @@ def receiveEgramDataFromPacemaker() -> tuple[list[float], list[float]]:
     # Send Egram Request Code
     byteArrayToWrite = bytearray(struct.pack(_STRUCT_FORMAT_STR, _SYNC_CODE))
     byteArrayToWrite.extend(bytearray(struct.pack(_STRUCT_FORMAT_STR, _EGRAM_FNCODE)))
-    print(f"BYTE DATA: {_unpackByteArray(byteArrayToWrite)}, BYTE SIZE OF PACKET: {len(byteArrayToWrite)}")
+        
     _writeSerialData(byteArrayToWrite)
 
     # Read Egram Data
@@ -93,6 +93,12 @@ def _writeSerialData(byteArray: bytearray):
     # Check that pacemaker comm port is plugged in
     if not isPacemakerConnected():
         raise ValueError(f"Pacemaker cannot be found.")
+    
+    while len(byteArray) < _PACKET_BYTESIZE:
+        byteArray.extend((bytearray(struct.pack(_STRUCT_FORMAT_STR, 0.0))))
+
+    if len(byteArray) > _PACKET_BYTESIZE:
+        raise ValueError(f"Size of packet being sent to pacemaker is too large.")
     
     # Write to port
     with serial.Serial(port=_pacemakerCommPort, 
@@ -108,6 +114,7 @@ def _writeSerialData(byteArray: bytearray):
         #sleep(1)
         print(f"WRITING...")
         ser.write(byteArray)
+        print(f"WROTE: {_unpackByteArray(byteArray)}")
 
 
 def _readSerialData() -> bytearray:
@@ -125,8 +132,8 @@ def _readSerialData() -> bytearray:
                        write_timeout=_SER_WRITE_TIMEOUT
                       ) as ser:  
         print(f"READING...")
-        byteArray = ser.read(50)
-        print(f"READ: {byteArray}")
+        byteArray = ser.read(_SER_MAX_READ_BYTE_LEN)
+        print(f"READ: {_unpackByteArray(byteArray)}")
     return byteArray
 
 
@@ -155,25 +162,17 @@ def _getPacingModeByte(pacingMode: str | PacingModes) -> bytes:
 
 def _calculateChecksum(byteArray: bytearray) -> int:
     # Checksum - Linear Combo of all data with coeffs of the index in the array (one-indexed)
-    unpackStr = _STRUCT_ENDIANNESS + _STRUCT_DATATYPE_CHAR * (len(byteArray) // _STRUCT_BYTESIZE_DATATYPE)
+    unpackStr = _STRUCT_ENDIANNESS_CHAR + _STRUCT_DATATYPE_CHAR * (len(byteArray) // _STRUCT_BYTESIZE_OF_DATATYPE)
     floatArray = struct.unpack(unpackStr, byteArray)
 
     checksum = numpy.double(0.0)
     for i in range(len(floatArray)):
         checksum += numpy.double(floatArray[i] * (i + 1))
-    
-    print(f"CHECKSUM: {checksum}")
     return checksum
-
-def _packByteArray(data: any, *byteArray: bytearray):
-    if byteArray:
-        return byteArray.extend(bytearray(struct.pack(_STRUCT_FORMAT_STR, data)))
-    else:
-        return bytearray(struct.pack(_STRUCT_FORMAT_STR, data))
 
 
 def _unpackByteArray(byteArray: bytearray):
-    unpackStr = _STRUCT_ENDIANNESS + _STRUCT_DATATYPE_CHAR * (len(byteArray) // _STRUCT_BYTESIZE_DATATYPE)
+    unpackStr = _STRUCT_ENDIANNESS_CHAR + _STRUCT_DATATYPE_CHAR * (len(byteArray) // _STRUCT_BYTESIZE_OF_DATATYPE)
     return struct.unpack(unpackStr, byteArray)
 
 # --- Pacemaker Connection Status ---

@@ -9,6 +9,7 @@ from user import User
 
 _MAX_USERS_SAVED = int(10)
 _REGEX_VALID_CHARS = "^[a-zA-Z0-9]*$"
+_PACEMAKER_CONNECTION_REFRESH_INTERVAL = 1000 # units of ms #TODO: Implement Pacemaker Connection Interval
 
 
 # --- Init ---
@@ -222,10 +223,7 @@ def getThresholdTitles() -> list[str]:
 
 
 def getThresholdTitle() -> str:
-    thresholdValueDict = Thresholds.getThresholdValues()
-    for name, value in thresholdValueDict.items():
-        if value == _activeUser.getThreshold():
-            return Thresholds.getThresholdTitles()[name]
+    return Thresholds[_activeUser.getThreshold()].getTitle()
 
 
 def setThresholdValueFromTitle(thresholdTitle: str) -> None:
@@ -233,24 +231,26 @@ def setThresholdValueFromTitle(thresholdTitle: str) -> None:
         thresholdTitleDict = Thresholds.getThresholdTitles()
         for name, title in thresholdTitleDict.items():
             if title == thresholdTitle:
-                thresholdValue = Thresholds.getThresholdValues()[name]
-                _activeUser.setThreshold(thresholdValue)
-    return list(Thresholds.getThresholdTitles().values())
+                _activeUser.setThreshold(name)
 
 
 # --- Send and Receive Pacemaker Data ---
 
 def connectToPacemaker() -> tuple[bool, str]:
     serial_comms.connectToPacemaker()
-    if not serial_comms.isPacemakerConnected():
-        return False, "Unable to find Pacemaker, please verify the Pacemaker is connected."
-    else:
+    if serial_comms.isPacemakerConnected():
         return True, ""
+    else:
+        return False, "Unable to find Pacemaker, please verify the Pacemaker is connected."
     
 
 def disconnectFromPacemaker() -> tuple[bool, str]:
     serial_comms.disconnectFromPacemaker()
     return True, ""
+
+
+def isPacemakerConnected() -> bool:
+    return serial_comms.isPacemakerConnected()
 
 
 def sendParameterDataToPacemaker() -> tuple[bool, str]:
@@ -259,7 +259,7 @@ def sendParameterDataToPacemaker() -> tuple[bool, str]:
 
     if serial_comms.sendParameterDataToPacemaker(_activeUser.getAllParameterValues(),
                                               _activeUser.getPacingMode(),
-                                              _activeUser.getThreshold()
+                                              Thresholds[_activeUser.getThreshold()].getValue()
                                              ):
         return True, ""
     else:
@@ -270,12 +270,3 @@ def getEgramDataFromPacemaker() -> tuple[list[float], list[float], list[float]]:
     atrialList, ventricalList = serial_comms.receiveEgramDataFromPacemaker()
     timeList = range(0, len(atrialList))
     return timeList, atrialList, ventricalList
-    # if PacingModes[_activeUser.getPacingMode()].isAtrialPacingType():
-    #     return timeList, atrialList
-    # elif PacingModes[_activeUser.getPacingMode()].isVentricularPacingType():
-    #     return timeList, ventricalList
-    
-# TODO: TESITNG
-#_activeUser = _users[0]
-#connectToPacemaker()
-#sendParameterDataToPacemaker()

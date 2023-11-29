@@ -1,7 +1,7 @@
 import tkinter as tk
 import GUI_helpers
-import global_vars
-import DCM_handler
+import GUI_global_vars as global_vars
+import GUI_DCM_handler as DCM_handler
 import user_manager
 
 _PAD_X = global_vars._PAD_X
@@ -41,7 +41,6 @@ def createAndShowWelcome():
     passwordInput.grid(row=5, column=0, padx=_PAD_X, pady=(_PAD_Y,_PAD_Y*4), columnspan=2)
     loginButton.grid(row=6, column=0, padx=_PAD_X, pady=_PAD_Y)
     createUserButton.grid(row=6, column=1, padx=_PAD_X, pady=_PAD_Y)
-    print("here")
 
 def onLogin():
     isSuccessfulLogin, errorMsg = user_manager.loginUser(usernameInput.get(), passwordInput.get())

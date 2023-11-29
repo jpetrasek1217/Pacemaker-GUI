@@ -1,6 +1,5 @@
 from tkinter import messagebox
 
-
 # GUI Popups
 
 def throwErrorPopup(msg: str) -> None:
