@@ -2,7 +2,7 @@ import tkinter as tk
 import tkinter.font as tkFont
 
 # Constants
-_VERSION_NUMBER = "2.1.5"
+_VERSION_NUMBER = "2.1.6"
 _ICON_BITMAP_FILEPATH = "assets/pacemaker_icon.ico"
 _WINDOW_TITLE = "Pacemaker Device Controller Monitor " + _VERSION_NUMBER
 _PAD_X = 16
