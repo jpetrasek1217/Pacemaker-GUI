@@ -51,7 +51,7 @@ def openEgram():
     egramSendDataButton = tk.Button(upperEgramFrame, width=_BUTTON_WIDTH*2, text="Send Parameter Data", pady=_PAD_Y, font=_FONT_DEFAULT, bg=_BUTTON_BG, command=egramSendData)
     egramSendDataButton.grid(row=2, columnspan=3, column=0,pady=(_PAD_Y*2,_PAD_Y))
     global egramRecieveDataButton
-    egramRecieveDataButton = tk.Button(upperEgramFrame, width=_BUTTON_WIDTH*3, text="Recieve + Show E-gram Data", pady=_PAD_Y, font=_FONT_DEFAULT, bg=_BUTTON_BG, command=egramRecieveData)
+    egramRecieveDataButton = tk.Button(upperEgramFrame, width=_BUTTON_WIDTH*3, text="Receive + Show E-gram Data", pady=_PAD_Y, font=_FONT_DEFAULT, bg=_BUTTON_BG, command=egramRecieveData)
     egramRecieveDataButton.grid(row=3, columnspan=3, column=0,pady=_PAD_Y)
     
     if user_manager.isPacemakerConnected():
@@ -119,7 +119,7 @@ def egramRecieveData():
     ax.plot(time,atrial)
     ax.plot(time, ventricular)
     ax.set_xlim(0, max(time))
-    ax.set_ylim(-1, 1)
+    ax.set_ylim(-0.05, 5.05)
 
     plotCanvas.draw()
     plotToolbar.update()

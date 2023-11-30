@@ -38,10 +38,12 @@ class User:
 
     
     def getThreshold(self) -> str:
+        '''Returns the User's threshold enum value.'''
         return self._threshold
 
 
     def setThreshold(self, threshold: str) -> None:
+        '''Sets the User's threshold enum value.'''
         self._threshold = str(threshold)
 
 

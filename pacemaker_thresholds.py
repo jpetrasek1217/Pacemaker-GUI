@@ -45,4 +45,5 @@ class Thresholds(Enum):
 
     @classmethod
     def getNominalValue(cls) -> float:
-        return Thresholds.MED.getValue()
+        '''Returns the default Threshold name'''
+        return Thresholds.MED.getName()

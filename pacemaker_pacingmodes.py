@@ -143,21 +143,24 @@ class PacingModes(Enum):
     
 
     def isThresholdVisible(self) -> bool:
+        '''Returns a boolean value of if the threshold should be editable for a given pacing mode.'''
         return self._isThresholdVisible
     
 
     def isAtrialPacingType(self) -> bool:
+        '''Returns a boolean value of if the given pacing mode is Atrial.'''
         return self._pacingType == _PACING_TYPE_ATRIAL
     
 
     def isVentricularPacingType(self) -> bool:
+        '''Returns a boolean value of if the given pacing mode is Ventricular.'''
         return self._pacingType == _PACING_TYPE_VENTRICULAR
     
     
     @classmethod
     def getInitialPacingMode(cls) -> str:
-        '''Returns the default Pacing Mode's name.'''
-        return PacingModes.AOO.name
+        '''Returns the default Pacing Mode name.'''
+        return PacingModes.AOO.getName()
     
 
     @classmethod

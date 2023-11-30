@@ -103,8 +103,7 @@ def receiveEgramDataFromPacemaker() -> tuple[list[float], list[float]]:
     if len(byteArrayFromRead) % _STRUCT_BYTESIZE_OF_DATATYPE != 0:
         return False
     egramDataTuple = _unpackByteArray(byteArrayFromRead)
-    midpoint = len(egramDataTuple) // 2
-    return egramDataTuple[0 : midpoint], egramDataTuple[midpoint : len(egramDataTuple)]
+    return egramDataTuple[0::2], egramDataTuple[1::2]
 
 
 # --- Read & Write ---
@@ -170,7 +169,9 @@ def _readSerialData() -> bytearray:
 
 # --- Helper Functions ---
 
-def _getPacingModeByte(pacingMode: str | PacingModes) -> bytes:
+def _getPacingModeByte(pacingMode: str | PacingModes) -> int:
+    '''Returns an integer value corresponding to each pacing mode.
+    The values are agreed upon between the DCM and the Pacemaker.'''
     if pacingMode == PacingModes.AOO.getName():
         return 0
     elif pacingMode == PacingModes.VOO.getName():
@@ -200,13 +201,14 @@ def _calculateChecksum(byteArray: bytearray) -> int:
     return checksum
 
 
-def _unpackByteArray(byteArray: bytearray):
+def _unpackByteArray(byteArray: bytearray) -> tuple[any]:
     unpackStr = _STRUCT_ENDIANNESS_CHAR + _STRUCT_DATATYPE_CHAR * (len(byteArray) // _STRUCT_BYTESIZE_OF_DATATYPE)
     return struct.unpack(unpackStr, byteArray)
 
 # --- Pacemaker Connection Status ---
 
 def connectToPacemaker() -> None:
+    '''Connects to the Pacemaker comm port.'''
     global _pacemakerCommPortName, _deviceType
     portDict = {port.description: port.name for port in port_list.comports()}
     for descp in portDict.keys():
@@ -222,15 +224,18 @@ def connectToPacemaker() -> None:
 
 
 def disconnectFromPacemaker() -> None:
+    '''Disconnects from the saved Pacemaker comm port.'''
     global _pacemakerCommPortName
     _pacemakerCommPortName = ''
 
 
 def isPacemakerConnected() -> bool:
-    return _pacemakerCommPortName in list(port.name for port in port_list.comports()) and onlyOnePacemakerConnected()
+    '''Returns a boolean value of if the saved Pacemaker is detected.'''
+    return _pacemakerCommPortName in list(port.name for port in port_list.comports()) and _onlyOnePacemakerConnected()
 
 
-def onlyOnePacemakerConnected() -> bool:
+def _onlyOnePacemakerConnected() -> bool:
+    '''Returns a boolean value if only 1 Pacemaker is detected.'''
     amountOfPacemakersDetected = 0
     portDict = {port.description: port.name for port in port_list.comports()}
     for descp in portDict.keys():

@@ -216,18 +216,22 @@ def _validateParameterValue(param: str, value: float) -> tuple[bool, str]:
 
 
 def isThresholdVisible() -> bool:
+    '''Returns a boolean value if the threshold parameter should be visible and editable given the current pacing mode.'''
     return PacingModes[_activeUser.getPacingMode()].isThresholdVisible()
 
 
 def getThresholdTitles() -> list[str]:
+    '''Returns the list of threshold titles for displying on the GUI.'''
     return list(Thresholds.getThresholdTitles().values())
 
 
 def getThresholdTitle() -> str:
+    '''Returns the title of the active user's saved threshold enum value.'''
     return Thresholds[_activeUser.getThreshold()].getTitle()
 
 
 def setThresholdValueFromTitle(thresholdTitle: str) -> None:
+    '''Sets the active user's saved threshold enum value to the passed string. Used by the GUI.'''
     if thresholdTitle in getThresholdTitles():
         thresholdTitleDict = Thresholds.getThresholdTitles()
         for name, title in thresholdTitleDict.items():
@@ -238,6 +242,7 @@ def setThresholdValueFromTitle(thresholdTitle: str) -> None:
 # --- Send and Receive Pacemaker Data ---
 
 def connectToPacemaker() -> tuple[bool, str]:
+    '''Connects the DCM to the Pacemaker via Serial Comms, returns True if the connection was successful, False otherwise.'''
     serial_comms.connectToPacemaker()
     if serial_comms.isPacemakerConnected():
         return True, ""
@@ -246,15 +251,18 @@ def connectToPacemaker() -> tuple[bool, str]:
     
 
 def disconnectFromPacemaker() -> tuple[bool, str]:
+    '''Disconnects the DCM from the Pacemaker, returns True if successful, False otherwise.'''
     serial_comms.disconnectFromPacemaker()
     return True, ""
 
 
 def isPacemakerConnected() -> bool:
+    '''Returns a boolean value of the status of the DCM being connected to the Pacemaker.'''
     return serial_comms.isPacemakerConnected()
 
 
 def sendParameterDataToPacemaker() -> tuple[bool, str]:
+    '''Sends the active user's saved parameters to the Pacemaker via Serial Comms.'''
     if not serial_comms.isPacemakerConnected():
         return False, "Unable to find Pacemaker, please verify the Pacemaker is connected and press 'Link\'."
 
@@ -268,6 +276,7 @@ def sendParameterDataToPacemaker() -> tuple[bool, str]:
 
 
 def getEgramDataFromPacemaker() -> tuple[list[float], list[float], list[float]]:
+    '''Receives EGram Data from the Pacemaker via Serial Comms, returns a tuple of three lists, for time, atrial voltage, and ventricular voltage data.'''
     atrialList, ventricalList = serial_comms.receiveEgramDataFromPacemaker()
-    timeList = range(0, len(atrialList))
+    timeList = range(0, len(atrialList)*2, 2)
     return timeList, atrialList, ventricalList
