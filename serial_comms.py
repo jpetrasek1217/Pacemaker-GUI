@@ -1,4 +1,3 @@
-from time import sleep  #TODO: REMOVE IF NOT NEEDED
 import serial
 import serial.tools.list_ports as port_list
 import struct
@@ -133,12 +132,9 @@ def _writeSerialData(byteArray: bytearray):
                        timeout=_SER_TIMEOUT, 
                        write_timeout=_SER_WRITE_TIMEOUT
                       ) as ser:  
-        #ser.reset_input_buffer()   #TODO: remove if not needed
-        #ser.reset_output_buffer()
-        #sleep(1)
-        print(f"WRITING...")
+        #print(f"WRITING...")
         ser.write(byteArray)
-        print(f"WROTE: {_unpackByteArray(byteArray)}")
+        #print(f"WROTE: {_unpackByteArray(byteArray)}")
 
 
 def _readSerialData() -> bytearray:
@@ -160,10 +156,10 @@ def _readSerialData() -> bytearray:
                        timeout=_SER_TIMEOUT, 
                        write_timeout=_SER_WRITE_TIMEOUT
                       ) as ser:  
-        print(f"READING...")
+        #print(f"READING...")
         byteArray = ser.read(_SER_MAX_READ_BYTE_LEN)
-        print(f"SIZE OF READ: {len(byteArray)}")
-        print(f"READ: {_unpackByteArray(byteArray)}")
+        #print(f"SIZE OF READ: {len(byteArray)}")
+        #print(f"READ: {_unpackByteArray(byteArray)}")
     return byteArray
 
 
