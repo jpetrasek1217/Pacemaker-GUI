@@ -17,10 +17,16 @@ _SER_TIMEOUT = 5                        # units of seconds
 _SER_WRITE_TIMEOUT = 0                  # units of seconds
 _SER_MAX_READ_BYTE_LEN = 32000          # units of bytes
 
-_PACEMAKER_COMM_PORT_DESCP = "JLink CDC UART Port"
-_pacemakerCommPort = ''                 # Active Comm Port that the pacemaker is connected to
+_pacemakerCommPortName = ''             # Active pacemaker comm ports, as required for PySerial connection
+_PACEMAKER_COMM_PORT_DESCP_WIN = 'JLink CDC UART Port'
+_PACEMAKER_COMM_PORT_DESCP_MAC = 'J-Link'
+_PACEMAKER_COMM_PORT_PREFIX_MAC = '/dev/'
 
-_SYNC_CODE = 22
+_deviceType = ''                        # Recorded type of device - ie Windows, Mac, etc
+_DEVICETYPE_WIN = "WIN"
+_DEVICETYPE_MAC = "MAC"
+
+_SYNC_CODE = 22                         # Function Codes for Serial Comms with Pacemaker - VALUES CANNOT CHANGE, AGREED COMMS BETWEEN PACEMAKER AND DCM
 _PARAMS_FNCODE = 85
 _PARAMS_SUCCESS_CODE = 76
 _EGRAM_FNCODE = 34
@@ -30,8 +36,7 @@ _STRUCT_DATATYPE_CHAR = 'd'             # Double
 _STRUCT_BYTESIZE_OF_DATATYPE = 8        # Double is 8 bytes
 _STRUCT_FORMAT_STR = _STRUCT_ENDIANNESS_CHAR + _STRUCT_DATATYPE_CHAR
 
-# THIS ORDER CANNOT CHANGE -- AGREED COMMS BETWEEN PACEMAKER AND DCM
-_PARAMS_NAMES_ORDERED_LIST = [
+_PARAMS_NAMES_ORDERED_LIST = [          # Ordered List of Parameters to send - VALUES CANNOT CHANGE, AGREED COMMS BETWEEN PACEMAKER AND DCM
     Parameters.LOWER_RATE_LIMIT.getName(),
     Parameters.UPPER_RATE_LIMIT.getName(),
     Parameters.ATRIAL_AMPLITUDE.getName(),
@@ -71,7 +76,10 @@ def sendParameterDataToPacemaker(params: dict[str, float], pacingMode: str | Pac
     _writeSerialData(byteArrayToWrite)
 
     # Read Success Message
-    successCode = _unpackByteArray(_readSerialData())
+    byteArrayFromRead = _readSerialData()
+    if len(byteArrayFromRead) % _STRUCT_BYTESIZE_OF_DATATYPE != 0:
+        return False
+    successCode = _unpackByteArray(byteArrayFromRead)
     try:
         successCode = int(successCode)
     except TypeError:
@@ -91,9 +99,12 @@ def receiveEgramDataFromPacemaker() -> tuple[list[float], list[float]]:
     _writeSerialData(byteArrayToWrite)
 
     # Read Egram Data
-    egramDataTuple = _unpackByteArray(_readSerialData())
+    byteArrayFromRead = _readSerialData()
+    if len(byteArrayFromRead) % _STRUCT_BYTESIZE_OF_DATATYPE != 0:
+        return False
+    egramDataTuple = _unpackByteArray(byteArrayFromRead)
     midpoint = len(egramDataTuple) // 2
-    return egramDataTuple[0:midpoint - 1], egramDataTuple[midpoint: len(egramDataTuple) - 1]
+    return egramDataTuple[0 : midpoint], egramDataTuple[midpoint : len(egramDataTuple)]
 
 
 # --- Read & Write ---
@@ -109,8 +120,13 @@ def _writeSerialData(byteArray: bytearray):
     if len(byteArray) > _PACKET_BYTESIZE:
         raise ValueError(f"Size of packet being sent to pacemaker is too large.")
     
+    # Adjust comm port for PySerial based on type of device
+    serPort = _pacemakerCommPortName
+    if _deviceType == _DEVICETYPE_MAC:
+        serPort = _PACEMAKER_COMM_PORT_PREFIX_MAC + _pacemakerCommPortName
+
     # Write to port
-    with serial.Serial(port=_pacemakerCommPort, 
+    with serial.Serial(port=serPort, 
                        baudrate=_SER_BAUDRATE, 
                        bytesize=_SER_BYTESIZE, 
                        parity=_SER_PARTITY, 
@@ -131,8 +147,13 @@ def _readSerialData() -> bytearray:
     if not isPacemakerConnected():
         raise ValueError(f"Pacemaker cannot be found.")
     
+    # Adjust comm port for PySerial based on type of device
+    serPort = _pacemakerCommPortName
+    if _deviceType == _DEVICETYPE_MAC:
+        serPort = _PACEMAKER_COMM_PORT_PREFIX_MAC + _pacemakerCommPortName
+
     # Read from Port
-    with serial.Serial(port=_pacemakerCommPort, 
+    with serial.Serial(port=serPort, 
                        baudrate=_SER_BAUDRATE, 
                        bytesize=_SER_BYTESIZE, 
                        parity=_SER_PARTITY, 
@@ -186,30 +207,34 @@ def _unpackByteArray(byteArray: bytearray):
 # --- Pacemaker Connection Status ---
 
 def connectToPacemaker() -> None:
-    global _pacemakerCommPort
+    global _pacemakerCommPortName, _deviceType
     portDict = {port.description: port.name for port in port_list.comports()}
     for descp in portDict.keys():
-        if descp.startswith(_PACEMAKER_COMM_PORT_DESCP):
-            _pacemakerCommPort = portDict[descp]
+        if descp.startswith(_PACEMAKER_COMM_PORT_DESCP_WIN) or descp.startswith(_PACEMAKER_COMM_PORT_DESCP_MAC):
+            _pacemakerCommPortName = portDict[descp]
+            if descp.startswith(_PACEMAKER_COMM_PORT_DESCP_WIN):
+                _deviceType = _DEVICETYPE_WIN
+            elif descp.startswith(_PACEMAKER_COMM_PORT_DESCP_MAC):
+                _deviceType = _DEVICETYPE_MAC
             break
     else:
-        _pacemakerCommPort = ''
+        _pacemakerCommPortName = ''
 
 
 def disconnectFromPacemaker() -> None:
-    global _pacemakerCommPort
-    _pacemakerCommPort = ''
+    global _pacemakerCommPortName
+    _pacemakerCommPortName = ''
 
 
 def isPacemakerConnected() -> bool:
-    return _pacemakerCommPort in list(port.name for port in port_list.comports()) and onlyOnePacemakerConnected()
+    return _pacemakerCommPortName in list(port.name for port in port_list.comports()) and onlyOnePacemakerConnected()
 
 
 def onlyOnePacemakerConnected() -> bool:
     amountOfPacemakersDetected = 0
     portDict = {port.description: port.name for port in port_list.comports()}
     for descp in portDict.keys():
-        if descp.startswith(_PACEMAKER_COMM_PORT_DESCP):
+        if descp.startswith(_PACEMAKER_COMM_PORT_DESCP_WIN) or descp.startswith(_PACEMAKER_COMM_PORT_DESCP_MAC):
             amountOfPacemakersDetected += 1
     if amountOfPacemakersDetected == 1:
         return True

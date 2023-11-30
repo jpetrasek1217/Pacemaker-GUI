@@ -264,7 +264,7 @@ def sendParameterDataToPacemaker() -> tuple[bool, str]:
                                              ):
         return True, ""
     else:
-        return False, "Did not receive success message, please try to send the data again."
+        return False, "Transmission of data was not successful, please try to send the data again."
 
 
 def getEgramDataFromPacemaker() -> tuple[list[float], list[float], list[float]]:
