@@ -221,7 +221,7 @@ def isThresholdVisible() -> bool:
 
 
 def getThresholdTitles() -> list[str]:
-    '''Returns the list of threshold titles for displying on the GUI.'''
+    '''Returns the list of threshold titles for displaying on the GUI.'''
     return list(Thresholds.getThresholdTitles().values())
 
 
@@ -276,7 +276,7 @@ def sendParameterDataToPacemaker() -> tuple[bool, str]:
 
 
 def getEgramDataFromPacemaker() -> tuple[list[float], list[float], list[float]]:
-    '''Receives EGram Data from the Pacemaker via Serial Comms, returns a tuple of three lists, for time, atrial voltage, and ventricular voltage data.'''
+    '''Receives electrocardiogram data from the Pacemaker via Serial Comms, returns a tuple of three lists, for time, atrial voltage, and ventricular voltage data.'''
     atrialList, ventricalList = serial_comms.receiveEgramDataFromPacemaker()
     timeList = range(0, len(atrialList)*2, 2)
     return timeList, atrialList, ventricalList

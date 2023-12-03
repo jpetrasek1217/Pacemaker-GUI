@@ -17,7 +17,7 @@ class Thresholds(Enum):
     
 
     def getName(self) -> str:
-        '''Returns the Threshold's name.  Used as the key for dictionaries containing Pacing Modes.'''
+        '''Returns the Threshold's name.  Used as the key for dictionaries containing Thresholds.'''
         return self.name
 
 
@@ -27,7 +27,7 @@ class Thresholds(Enum):
     
 
     def getValue(self) -> float:
-        '''Returns the Threshold Value.'''
+        '''Returns the Threshold numerical value used by the Pacemaker.'''
         return self._value
 
 
@@ -45,5 +45,5 @@ class Thresholds(Enum):
 
     @classmethod
     def getNominalValue(cls) -> float:
-        '''Returns the default Threshold name'''
+        '''Returns the default Threshold name.'''
         return Thresholds.MED.getName()

@@ -30,7 +30,7 @@ _PARAMS_FNCODE = 85
 _PARAMS_SUCCESS_CODE = 76
 _EGRAM_FNCODE = 34
 
-_STRUCT_ENDIANNESS_CHAR = '<'           # Little Endian
+_STRUCT_ENDIANNESS_CHAR = '<'           # Little Endian - VALUES CANNOT CHANGE, AGREED COMMS BETWEEN PACEMAKER AND DCM
 _STRUCT_DATATYPE_CHAR = 'd'             # Double
 _STRUCT_BYTESIZE_OF_DATATYPE = 8        # Double is 8 bytes
 _STRUCT_FORMAT_STR = _STRUCT_ENDIANNESS_CHAR + _STRUCT_DATATYPE_CHAR
@@ -57,6 +57,8 @@ _PACKET_BYTESIZE = (len(_PARAMS_NAMES_ORDERED_LIST) + 5) * _STRUCT_BYTESIZE_OF_D
 # --- Send & Receive Data ---
 
 def sendParameterDataToPacemaker(params: dict[str, float], pacingMode: str | PacingModes, threshold: float) -> bool:
+    '''Sends the passed Pacemaker parameters, pacing mode and threshold to the connected Pacemaker.
+    Returns true if the data was sent and received properly, false otherwise.'''
     # Construct byte array - Reference Docs for structure and order of data
     byteArrayToWrite = bytearray(struct.pack(_STRUCT_FORMAT_STR, _SYNC_CODE))
     byteArrayToWrite.extend(bytearray(struct.pack(_STRUCT_FORMAT_STR, _PARAMS_FNCODE)))
@@ -90,6 +92,7 @@ def sendParameterDataToPacemaker(params: dict[str, float], pacingMode: str | Pac
 
 
 def receiveEgramDataFromPacemaker() -> tuple[list[float], list[float]]:
+    '''Sends a request to the Pacemaker for the E-Gram data. Returns two lists of Atrial and Ventricular voltage data.'''
     # Construct byte array - Reference Docs for structure and order of data
     byteArrayToWrite = bytearray(struct.pack(_STRUCT_FORMAT_STR, _SYNC_CODE))
     byteArrayToWrite.extend(bytearray(struct.pack(_STRUCT_FORMAT_STR, _EGRAM_FNCODE)))
@@ -102,12 +105,13 @@ def receiveEgramDataFromPacemaker() -> tuple[list[float], list[float]]:
     if len(byteArrayFromRead) % _STRUCT_BYTESIZE_OF_DATATYPE != 0:
         return False
     egramDataTuple = _unpackByteArray(byteArrayFromRead)
-    return egramDataTuple[0::2], egramDataTuple[1::2]
+    return egramDataTuple[0::2], egramDataTuple[1::2]   # Split odd and even indexes, as data is sent in (atrial, ventrical) pairs
 
 
 # --- Read & Write ---
 
 def _writeSerialData(byteArray: bytearray):
+    '''Writes to the serial port that the Pacemaker is connected to.'''
     # Check that pacemaker comm port is plugged in
     if not isPacemakerConnected():
         raise ValueError(f"Pacemaker cannot be found.")
@@ -138,6 +142,7 @@ def _writeSerialData(byteArray: bytearray):
 
 
 def _readSerialData() -> bytearray:
+    '''Reads from the serial port that the Pacemaker is connected to.'''
     # Check that pacemaker comm port is plugged in
     if not isPacemakerConnected():
         raise ValueError(f"Pacemaker cannot be found.")
@@ -189,6 +194,7 @@ def _getPacingModeByte(pacingMode: str | PacingModes) -> int:
 
 
 def _calculateChecksum(byteArray: bytearray) -> int:
+    '''Calculates the checksum of the passed bytearray. Interperts the data with the _STRUCT_DATATYPE_CHAR value.'''
     # Checksum - Linear Combo of all data with coeffs of the index in the array (one-indexed)
     floatArray = _unpackByteArray(byteArray)
     checksum = numpy.double(0.0)
@@ -198,13 +204,14 @@ def _calculateChecksum(byteArray: bytearray) -> int:
 
 
 def _unpackByteArray(byteArray: bytearray) -> tuple[any]:
+    '''Unpacks the passed bytearray. Returns a tuple of the datatype of _STRUCT_DATATYPE_CHAR.'''
     unpackStr = _STRUCT_ENDIANNESS_CHAR + _STRUCT_DATATYPE_CHAR * (len(byteArray) // _STRUCT_BYTESIZE_OF_DATATYPE)
     return struct.unpack(unpackStr, byteArray)
 
 # --- Pacemaker Connection Status ---
 
 def connectToPacemaker() -> None:
-    '''Connects to the Pacemaker comm port.'''
+    '''Connects the serial comms to the Pacemaker.'''
     global _pacemakerCommPortName, _deviceType
     portDict = {port.description: port.name for port in port_list.comports()}
     for descp in portDict.keys():
@@ -220,18 +227,18 @@ def connectToPacemaker() -> None:
 
 
 def disconnectFromPacemaker() -> None:
-    '''Disconnects from the saved Pacemaker comm port.'''
+    '''Disconnects the serial comms to the Pacemaker.'''
     global _pacemakerCommPortName
     _pacemakerCommPortName = ''
 
 
 def isPacemakerConnected() -> bool:
-    '''Returns a boolean value of if the saved Pacemaker is detected.'''
+    '''Returns a boolean value of whether the serial comms detects the Pacemaker.'''
     return _pacemakerCommPortName in list(port.name for port in port_list.comports()) and _onlyOnePacemakerConnected()
 
 
 def _onlyOnePacemakerConnected() -> bool:
-    '''Returns a boolean value if only 1 Pacemaker is detected.'''
+    '''Returns a boolean value of whether only 1 Pacemaker is detected.'''
     amountOfPacemakersDetected = 0
     portDict = {port.description: port.name for port in port_list.comports()}
     for descp in portDict.keys():
